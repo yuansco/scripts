@@ -1,7 +1,7 @@
 #!/bin/bash
 # Install Chromebook develop environment script
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/04/08
+# Last modified on 2024/04/11
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -31,6 +31,12 @@ INSTALL_TREE="Y"                # Tree (for tree command)
 INSTALL_SCREENSHOT="Y"          # Gnome-Screenshot (screenshot tool)
 INSTALL_CHEWING="Y"             # Chewing (Chinese Input Method)
 INSTALL_DEV_TOOL="Y"            # chromium releate tools
+
+# Install private tool
+INSTALL_PRIVATE_TOOL="Y"
+INSTALL_PRIVATE_CONSOLE_TOOL="Y"        # Install console tool
+INSTALL_PRIVATE_EXTRACT_TOOL="Y"        # Install extract tool
+INSTALL_PRIVATE_FLASHDISK_TOOL="Y"      # Install flashdisk tool
 
 # sync tast-tests-private repo
 # Note: config gerrit ssh key is necessary for sync private repo
@@ -139,6 +145,7 @@ function LOG_W(){
 function LOG_E(){
     red "[ERROR]"
     echo $2 $1 
+    exit 0
 }
 
 # log command message
@@ -198,10 +205,10 @@ Install Gparted: $INSTALL_GPARTED
 Install Net-tool: $INSTALL_NETTOOL
 Install Tree: $INSTALL_TREE
 Install Gnome-Screenshot: $INSTALL_SCREENSHOT
-Sync tast-tests-private repo: $SYNC_TAST_TESTS_PRIVATE
 Chroot dev tools: $INSTALL_DEV_TOOL
 Chroot repo sync: $CHROOT_REPO_SYNC
 Chroot sync jobs: $CHROOT_SYNC_JOBS
+Chroot sync tast-tests-private repo: $SYNC_TAST_TESTS_PRIVATE
 Chroot run cros_sdk: $CHROOT_CREATE
 Chroot run setup_board: $CHROOT_SETUP_BOARD
 Chroot setup_board target: $CHROOT_SETUP_BOARD
@@ -243,7 +250,6 @@ source ~/.bashrc
 
 
 LOG "Start to install useful tool..."
-
 
 cd ~
 
@@ -385,6 +391,87 @@ then
     sudo apt install -y ibus-chewing
 fi
 
+#############################################
+# Install private tool
+# e.g. console tool, extract and flashdisk
+#############################################
+
+cd ~
+
+if [[ "INSTALL_PRIVATE_TOOL" == "Y" ]]
+then
+    LOG "Start to install private tool..."
+
+    key="none"
+
+    # get private tool key from ~/key.txt
+    if [ ! -f ~/key.txt ]; then
+        LOG_W "private tool key not found!"
+        read -p "press y to continue..." re
+    else
+        LOG "private tool key exist!"
+        key=$(cat ~/key.txt)
+    fi
+fi
+
+if [[ "$INSTALL_PRIVATE_CONSOLE_TOOL" == "Y" && "$key" != "none" ]]
+then
+    LOG "Install console tool"
+
+    wget https://github.com/yuansco/scripts/raw/main/console_tool.zip
+
+    if [ ! -f ~/console_tool.zip ]; then
+        LOG_W "Download fail!"
+    else
+        unzip -P $key console_tool.zip
+        chmod a+x ~/console_tool.sh
+        echo "alias console='~/console_tool.sh'" >> ~/.bashrc
+        source ~/.bashrc
+
+        re=$(~/console_tool.sh -V |grep "Script Version")
+        if [[ "$re" != "" ]]
+        then
+            LOG "Install Done"
+        else
+            LOG_W "Install fail!"
+        fi
+        rm -f ./console_tool.zip
+    fi
+fi
+
+if [[ "$INSTALL_PRIVATE_EXTRACT_TOOL" == "Y" && "$key" != "none" ]]
+then
+    LOG "Install extract tool"
+
+    wget https://github.com/yuansco/scripts/raw/main/extract.zip
+
+    if [ ! -f ~/extract.zip ]; then
+        LOG_W "Download fail!"
+    else
+        unzip -P $key extract.zip
+        mkdir -p ~/Downloads/cpfe
+        mv ./extract.sh ~/Downloads/cpfe/extract.sh
+        chmod a+x ~/Downloads/cpfe/extract.sh
+        rm -f ./extract.zip
+    fi
+fi
+
+if [[ "$INSTALL_PRIVATE_FLASHDISK_TOOL" == "Y" && "$key" != "none" ]]
+then
+    LOG "Install flashdisk tool"
+
+    wget https://github.com/yuansco/scripts/raw/main/flashdisk.zip
+
+    if [ ! -f ~/extract.zip ]; then
+        LOG_W "Download fail!"
+    else
+        unzip -P $key flashdisk.zip
+        mkdir -p ~/Downloads/cpfe
+        mv ./extract.sh ~/Downloads/cpfe/flashdisk.sh
+        chmod a+x ~/Downloads/cpfe/extract.sh
+        rm -f ./flashdisk.zip
+    fi
+fi
 
 #############################################
 # Install development tools
@@ -489,6 +576,12 @@ then
     cros_sdk setup_board --board=$CHROOT_TATGET_BOARD
 fi
 
+# Setup folder tree
+mkdir -p ~/chromiumos/src/myfile
+mkdir -p ~/chromiumos/src/myfile/firmware
+mkdir -p ~/chromiumos/src/myfile/cbi
+mkdir -p ~/chromiumos/src/myfile/scripts
+
 
 #############################################
 # Servod Outside of Chroot
@@ -550,8 +643,7 @@ then
     re=$(docker run hello-world|grep "Hello from Docker!")
     if [[ "$re" == "" ]]
     then
-        LOG_E " Setup run Docker without sudo fail!"
-        exit 0
+        LOG_W "Setup run Docker without sudo fail!"
     fi
 
     # Config Docker to start via systemd
@@ -568,10 +660,7 @@ then
     re=$(echo "import docker" | python3)
     if [[ "$re" != "" ]]
     then
-        LOG_E "import docker fail:"
-        echo $re
-        LOG "Exit script..."
-        exit 0
+        LOG_E "import docker fail: $re"
     fi
 
     # Add hdctools path to $PATH
