@@ -1,7 +1,7 @@
 #!/bin/bash
 # Install Chromebook develop environment script
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/04/11
+# Last modified on 2024/04/22
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -241,6 +241,9 @@ echo "alias EDITOR='nano'" >> ~/.bashrc
 # Use gitlog to quickly print oneline git log
 echo "alias gitlog='git log --pretty=oneline'" >> ~/.bashrc
 
+# Always show the debug log when building EC binary files by zmake
+echo "alias zmake='zmake -l DEBUG'" >> ~/.bashrc
+
 source ~/.bashrc
 
 #############################################
@@ -402,6 +405,8 @@ if [[ "INSTALL_PRIVATE_TOOL" == "Y" ]]
 then
     LOG "Start to install private tool..."
 
+    mkdir -p ~/workspace/cpfe
+
     key="none"
 
     # get private tool key from ~/key.txt
@@ -424,11 +429,12 @@ then
         LOG_W "Download fail!"
     else
         unzip -P $key console_tool.zip
-        chmod a+x ~/console_tool.sh
-        echo "alias console='~/console_tool.sh'" >> ~/.bashrc
+        mv ./console_tool.sh ~/workspace/console_tool.sh
+        chmod a+x ~/workspace/console_tool.sh
+        echo "alias console='~/workspace/console_tool.sh'" >> ~/.bashrc
         source ~/.bashrc
 
-        re=$(~/console_tool.sh -V |grep "Script Version")
+        re=$(~/workspace/console_tool.sh -V |grep "Script Version")
         if [[ "$re" != "" ]]
         then
             LOG "Install Done"
@@ -449,9 +455,8 @@ then
         LOG_W "Download fail!"
     else
         unzip -P $key extract.zip
-        mkdir -p ~/Downloads/cpfe
-        mv ./extract.sh ~/Downloads/cpfe/extract.sh
-        chmod a+x ~/Downloads/cpfe/extract.sh
+        mv ./extract.sh ~/workspace/cpfe/extract.sh
+        chmod a+x ~/workspace/cpfe/extract.sh
         rm -f ./extract.zip
     fi
 fi
@@ -462,13 +467,13 @@ then
 
     wget https://github.com/yuansco/scripts/raw/main/flashdisk.zip
 
-    if [ ! -f ~/extract.zip ]; then
+        if [ ! -f ~/extract.zip ]; then
         LOG_W "Download fail!"
     else
         unzip -P $key flashdisk.zip
         mkdir -p ~/Downloads/cpfe
-        mv ./extract.sh ~/Downloads/cpfe/flashdisk.sh
-        chmod a+x ~/Downloads/cpfe/extract.sh
+        mv ./extract.sh ~/workspace/cpfe/flashdisk.sh
+        chmod a+x ~/workspace/cpfe/extract.sh
         rm -f ./flashdisk.zip
     fi
 fi
