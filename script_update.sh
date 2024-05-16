@@ -20,9 +20,9 @@ fi
 # pack
 if [[ "$1" == "-p" ]]
 then
-    zip -rP $key ./console_tool.zip ~/workspace/console_tool.sh
-    zip -rP $key ./extract.zip ~/workspace/cpfe/extract.sh
-    zip -rP $key ./flashdisk.zip ~/workspace/cpfe/flashdisk.sh
+    zip -rP $key ./console_tool.zip ./console_tool.sh
+    zip -rP $key ./extract.zip ./extract.sh
+    zip -rP $key ./flashdisk.zip ./flashdisk.sh
 
     echo "script pack finish!"
 
@@ -38,7 +38,6 @@ then
     #mv ./flashdisk.sh ~/workspace/cpfe/flashdisk.sh
 
     echo "script release finish!"
-fi
 
 # download
 elif [[ "$1" == "-d" ]]

@@ -1,7 +1,8 @@
 #!/bin/bash
 # Install Chromebook develop environment script
+# https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/04/22
+# Last modified on 2024/05/17
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -74,11 +75,13 @@ ssh_key="N"
 
 # Chromium Gerrit key:
 function chromium_gerrit_key(){
+    # TODO
     return
 }
 
 # Chromium Internal Gerrit key:
 function chromium_internal_gerrit_key(){
+    # TODO
     return
 }
 
@@ -399,13 +402,13 @@ fi
 # e.g. console tool, extract and flashdisk
 #############################################
 
-cd ~
 
-if [[ "INSTALL_PRIVATE_TOOL" == "Y" ]]
+if [[ "$INSTALL_PRIVATE_TOOL" == "Y" ]]
 then
     LOG "Start to install private tool..."
 
     mkdir -p ~/workspace/cpfe
+    cd ~/workspace/
 
     key="none"
 
@@ -417,64 +420,67 @@ then
         LOG "private tool key exist!"
         key=$(cat ~/key.txt)
     fi
-fi
 
-if [[ "$INSTALL_PRIVATE_CONSOLE_TOOL" == "Y" && "$key" != "none" ]]
-then
-    LOG "Install console tool"
 
-    wget https://github.com/yuansco/scripts/raw/main/console_tool.zip
+    # console tool
+    if [[ "$INSTALL_PRIVATE_CONSOLE_TOOL" == "Y" && "$key" != "none" ]]
+    then
+        LOG "Install console tool"
 
-    if [ ! -f ~/console_tool.zip ]; then
-        LOG_W "Download fail!"
-    else
-        unzip -P $key console_tool.zip
-        mv ./console_tool.sh ~/workspace/console_tool.sh
-        chmod a+x ~/workspace/console_tool.sh
-        echo "alias console='~/workspace/console_tool.sh'" >> ~/.bashrc
-        source ~/.bashrc
+        wget https://github.com/yuansco/scripts/raw/main/console_tool.zip
 
-        re=$(~/workspace/console_tool.sh -V |grep "Script Version")
-        if [[ "$re" != "" ]]
-        then
-            LOG "Install Done"
+        if [ ! -f ./console_tool.zip ]; then
+            LOG_W "Download fail!"
         else
-            LOG_W "Install fail!"
+            unzip -P $key ./console_tool.zip
+            chmod a+x ~/workspace/console_tool.sh
+            echo "alias console='~/workspace/console_tool.sh'" >> ~/.bashrc
+            source ~/.bashrc
+
+            re=$(~/workspace/console_tool.sh -V |grep "Script Version")
+            if [[ "$re" != "" ]]
+            then
+                LOG "Install Done"
+            else
+                LOG_W "Install fail!"
+            fi
+            rm -f ./console_tool.zip
         fi
-        rm -f ./console_tool.zip
     fi
-fi
 
-if [[ "$INSTALL_PRIVATE_EXTRACT_TOOL" == "Y" && "$key" != "none" ]]
-then
-    LOG "Install extract tool"
+    # cpfe/extract.sh
+    if [[ "$INSTALL_PRIVATE_EXTRACT_TOOL" == "Y" && "$key" != "none" ]]
+    then
+        LOG "Install extract tool"
 
-    wget https://github.com/yuansco/scripts/raw/main/extract.zip
+        wget https://github.com/yuansco/scripts/raw/main/extract.zip
 
-    if [ ! -f ~/extract.zip ]; then
-        LOG_W "Download fail!"
-    else
-        unzip -P $key extract.zip
-        mv ./extract.sh ~/workspace/cpfe/extract.sh
-        chmod a+x ~/workspace/cpfe/extract.sh
-        rm -f ./extract.zip
+        if [ ! -f ./extract.zip ]; then
+            LOG_W "Download fail!"
+        else
+            unzip -P $key ./extract.zip
+            mv ./extract.sh ~/workspace/cpfe/extract.sh
+            chmod a+x ~/workspace/cpfe/extract.sh
+            rm -f ./extract.zip
+        fi
     fi
-fi
 
-if [[ "$INSTALL_PRIVATE_FLASHDISK_TOOL" == "Y" && "$key" != "none" ]]
-then
-    LOG "Install flashdisk tool"
+    # cpfe/flashdisk.sh
+    if [[ "$INSTALL_PRIVATE_FLASHDISK_TOOL" == "Y" && "$key" != "none" ]]
+    then
+        LOG "Install flashdisk tool"
 
-    wget https://github.com/yuansco/scripts/raw/main/flashdisk.zip
+        wget https://github.com/yuansco/scripts/raw/main/flashdisk.zip
 
-        if [ ! -f ~/extract.zip ]; then
-        LOG_W "Download fail!"
-    else
-        unzip -P $key flashdisk.zip
-        mkdir -p ~/Downloads/cpfe
-        mv ./extract.sh ~/workspace/cpfe/flashdisk.sh
-        chmod a+x ~/workspace/cpfe/extract.sh
-        rm -f ./flashdisk.zip
+            if [ ! -f ./flashdisk.zip ]; then
+            LOG_W "Download fail!"
+        else
+            unzip -P $key ./flashdisk.zip
+            mkdir -p ~/Downloads/cpfe
+            mv ./flashdisk.sh ~/workspace/cpfe/flashdisk.sh
+            chmod a+x ~/workspace/cpfe/extract.sh
+            rm -f ./flashdisk.zip
+        fi
     fi
 fi
 
@@ -483,6 +489,7 @@ fi
 # https://chromium.googlesource.com/chromiumos/docs/+/HEAD/developer_guide.md#install-development-tools
 #############################################
 
+cd ~
 if [[ "$INSTALL_DEV_TOOL" == "Y" ]]
 then
     LOG "Start to install development tool..."
@@ -575,7 +582,7 @@ then
 fi
 
 # run setup board after create chroot
-if [[ "$CHROOT_SETUP_BOARD" == "Y" && "$BOARD" != "" ]]
+if [[ "$CHROOT_SETUP_BOARD" == "Y" && "$CHROOT_TATGET_BOARD" != "" ]]
 then
     LOG "setup board"
     cros_sdk setup_board --board=$CHROOT_TATGET_BOARD
