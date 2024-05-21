@@ -8,13 +8,13 @@ sha_extract_tool="c8e1a71ff97269fa2bc5f892c854bddf21bcc825"
 sha_console_tool="f94db86665771abbe5f74a051e6d2d588ecd99c4"
 
 
-# get private tool key from ~/key.txt
-if [ ! -f ~/key.txt ]; then
+# get private tool key from ~/.key.txt
+if [ ! -f ~/.key.txt ]; then
     LOG_W "private tool key not found!"
     exit 0
 else
     echo "private tool key exist!"
-    key=$(cat ~/key.txt)
+    key=$(cat ~/.key.txt)
 fi
 
 # pack

@@ -412,13 +412,13 @@ then
 
     key="none"
 
-    # get private tool key from ~/key.txt
-    if [ ! -f ~/key.txt ]; then
+    # get private tool key from ~/.key.txt
+    if [ ! -f ~/.key.txt ]; then
         LOG_W "private tool key not found!"
         read -p "press y to continue..." re
     else
         LOG "private tool key exist!"
-        key=$(cat ~/key.txt)
+        key=$(cat ~/.key.txt)
     fi
 
 
