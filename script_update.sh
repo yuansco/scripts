@@ -3,8 +3,8 @@
 # sha1sum ~/workspace/console_tool.sh |cut -d ' ' -f 1
 # sha1sum ~/workspace/cpfe/extract.sh |cut -d ' ' -f 1
 # sha1sum ~/workspace/cpfe/flashdisk.sh |cut -d ' ' -f 1
-sha_console_tool="d5075aaecd6fef1d32fe40caf800771f455e3008"
-sha_extract_tool="c8e1a71ff97269fa2bc5f892c854bddf21bcc825"
+sha_console_tool="1620490777d9496cc043213f2c6f35a8b1b70785"
+sha_extract_tool="89b527ec36b89f10e5c01b24ad2b9fa7b05f0eea"
 sha_console_tool="f94db86665771abbe5f74a051e6d2d588ecd99c4"
 
 
