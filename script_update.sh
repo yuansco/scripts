@@ -4,7 +4,7 @@
 # sha1sum ~/workspace/cpfe/extract.sh |cut -d ' ' -f 1
 # sha1sum ~/workspace/cpfe/flashdisk.sh |cut -d ' ' -f 1
 sha_console_tool="1620490777d9496cc043213f2c6f35a8b1b70785"
-sha_extract_tool="89b527ec36b89f10e5c01b24ad2b9fa7b05f0eea"
+sha_extract_tool="71c078f7907462ac81fdb60eb5e1ed291eec1fed"
 sha_console_tool="f94db86665771abbe5f74a051e6d2d588ecd99c4"
 
 
@@ -15,6 +15,7 @@ if [ ! -f ~/.key.txt ]; then
 else
     echo "private tool key exist!"
     key=$(cat ~/.key.txt)
+    echo "key: $key"
 fi
 
 # pack
