@@ -494,7 +494,7 @@ if [[ "$INSTALL_DEV_TOOL" == "Y" ]]
 then
     LOG "Start to install development tool..."
     sudo add-apt-repository universe
-    sudo apt-get install -y git gitk git-gui curl xz-utils python3-pkg-resources python3-virtualenv python3-oauth2client
+    sudo apt-get install -y git gitk git-gui curl xz-utils
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
     echo "export PATH=$PATH:~/depot_tools" >> ~/.bashrc
     # If you plan to work with chroot frequently, Adding an alias to enter chroot will be convenient.
