@@ -12,6 +12,7 @@
 #############################################
 
 # User name and email address for setup git
+# TODO: (1) update your name amd mail
 USEREMAL="foo@quanta.corp-partner.google.com"
 USERNAME="foo"
 
@@ -41,16 +42,18 @@ INSTALL_PRIVATE_FLASHDISK_TOOL="Y"      # Install flashdisk tool
 
 # sync tast-tests-private repo
 # Note: config gerrit ssh key is necessary for sync private repo
+# TODO: (2) turn on sync tast-tests-private repo if needed
 SYNC_TAST_TESTS_PRIVATE="N"
 
 
 # Chroot config:
 CHROOT_REPO_INIT="Y"            # init repo folder
 CHROOT_REPO_SYNC="Y"            # sync source code
-CHROOT_SYNC_JOBS=8              # Allow N jobs at repo sync
+CHROOT_SYNC_JOBS=8              # allow N jobs at repo sync
 CHROOT_CREATE="Y"               # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"          # run setup board after create chroot
-CHROOT_TATGET_BOARD="brya"      # Board for setup_board command
+# TODO: (3) select a baseboard name for setup_board, default is nissa
+CHROOT_TATGET_BOARD="nissa"     # baseboard for setup_board command
 
 # Setup docker Servod
 SETUP_DOCKER_SERVOD="Y"
@@ -71,6 +74,7 @@ SETUP_DOCKER_SERVOD="Y"
 # https://chrome-internal-review.googlesource.com/settings/#HTTPCredentials
 # HTTP Credentials > Obtain password (opens in a new tab) > Configure Git
 
+# TODO: (4) config your gerrit ssh key and turn on ssh_key="Y" if needed
 ssh_key="N"
 
 # Chromium Gerrit key:
@@ -232,20 +236,42 @@ fi
 #############################################
 
 # defend themselves against accidentally deleting files by creating an alias
-echo "alias rm='rm -i'" >> ~/.bashrc
+
+config_rm=$(cat ~/.bashrc |grep rm)
+
+if [[ "$config_scp" == "" ]]
+then
+    echo "alias rm='rm -i'" >> ~/.bashrc
+fi
+
 
 # always clear known_hosts to prevent issue "WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!"
-echo "alias scp='rm -f /home/$USER/.ssh/known_hosts;scp'" >> ~/.bashrc
-echo "alias ssh='rm -f /home/$USER/.ssh/known_hosts;ssh'" >> ~/.bashrc
+
+config_scp=$(cat ~/.bashrc |grep scp)
+
+if [[ "$config_scp" == "" ]]
+then
+    echo "alias scp='rm -f /home/$USER/.ssh/known_hosts;scp'" >> ~/.bashrc
+    echo "alias ssh='rm -f /home/$USER/.ssh/known_hosts;ssh'" >> ~/.bashrc
+fi
 
 # Use nano when edit commit message
-echo "alias EDITOR='nano'" >> ~/.bashrc
+
+config_nano=$(cat ~/.bashrc |grep nano)
+
+if [[ "$config_nano" == "" ]]
+then
+    echo "alias EDITOR='nano'" >> ~/.bashrc
+fi
 
 # Use gitlog to quickly print oneline git log
-echo "alias gitlog='git log --pretty=oneline'" >> ~/.bashrc
 
-# Always show the debug log when building EC binary files by zmake
-echo "alias zmake='zmake -l DEBUG'" >> ~/.bashrc
+config_nano=$(cat ~/.bashrc |grep gitlog)
+
+if [[ "$config_gitlog" == "" ]]
+then
+    echo "alias gitlog='git log --pretty=oneline'" >> ~/.bashrc
+fi
 
 source ~/.bashrc
 
@@ -605,6 +631,10 @@ then
 
     LOG "Setup docker Servod"
 
+    # Add hdctools path to $PATH
+    echo "export PATH=~/chromiumos/src/third_party/hdctools/scripts:$PATH" >> ~/.bashrc
+    source ~/.bashrc
+
     #  Install Docker Engine on Ubuntu
     for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
 
@@ -674,10 +704,6 @@ then
     then
         LOG_E "import docker fail: $re"
     fi
-
-    # Add hdctools path to $PATH
-    echo "export PATH=~/chromiumos/src/third_party/hdctools/scripts:$PATH" >> ~/.bashrc
-    source ~/.bashrc
 
     echo "Config Servod Done!"
 
