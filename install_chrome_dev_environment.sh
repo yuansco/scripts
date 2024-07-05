@@ -25,6 +25,7 @@ INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser
 INSTALL_VSCODE="Y"              # Visual Studio Code
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)
+INSTALL_PICOCOM="Y"             # Picocom (serial communication tool)
 INSTALL_MELD="Y"                # Meld (text compare tool)
 INSTALL_GPARTED="Y"             # Gparted (disk partition editor)
 INSTALL_NETTOOL="Y"             # Net-tool (for ifconfig command)
@@ -34,11 +35,6 @@ INSTALL_SCREENSHOT="Y"          # Gnome-Screenshot (screenshot tool)
 INSTALL_CHEWING="Y"             # Chewing (Chinese Input Method)
 INSTALL_DEV_TOOL="Y"            # chromium releate tools
 
-# Install private tool
-INSTALL_PRIVATE_TOOL="Y"
-INSTALL_PRIVATE_CONSOLE_TOOL="Y"        # Install console tool
-INSTALL_PRIVATE_EXTRACT_TOOL="Y"        # Install extract tool
-INSTALL_PRIVATE_FLASHDISK_TOOL="Y"      # Install flashdisk tool
 
 # sync tast-tests-private repo
 # Note: config gerrit ssh key is necessary for sync private repo
@@ -207,6 +203,7 @@ Install Google Chrome Browser: $INSTALL_CHROME_BROWSER
 Install Visual Studio Code: $INSTALL_VSCODE
 Install Tabby: $INSTALL_TABBY
 Install Minicom: $INSTALL_MINICOM
+Install Picocom: $INSTALL_PICOCOM
 Install Meld: $INSTALL_MELD
 Install Gparted: $INSTALL_GPARTED
 Install Net-tool: $INSTALL_NETTOOL
@@ -381,6 +378,12 @@ then
     sudo apt install -y minicom
 fi
 
+if [[ "$INSTALL_PICOCOM" == "Y" ]]
+then
+    LOG "Install Picocom"
+    sudo apt install -y picocom
+fi
+
 if [[ "$INSTALL_MELD" == "Y" ]]
 then
     LOG "Install Meld"
@@ -429,85 +432,33 @@ fi
 #############################################
 
 
-if [[ "$INSTALL_PRIVATE_TOOL" == "Y" ]]
+install_tool="Y"
+
+# get zip key from $ZIPKEY or ~/.key.txt
+if [[ "$ZIPKEY" == "" ]]
+then
+
+    if [ ! -f ~/.key.txt ]
+    then
+        install_tool="N"
+    else
+        ZIPKEY=$(cat ~/.key.txt)
+    fi
+fi
+
+
+if [[ "$install_tool" == "Y" ]]
 then
     LOG "Start to install private tool..."
 
-    mkdir -p ~/workspace/cpfe
-    cd ~/workspace/
+    LOG "zip key: $ZIPKEY"
 
-    key="none"
+    wget https://raw.githubusercontent.com/yuansco/scripts/main/script_update.sh
+    chmod a+x ./script_update.sh
 
-    # get private tool key from ~/.key.txt
-    if [ ! -f ~/.key.txt ]; then
-        LOG_W "private tool key not found!"
-        read -p "press y to continue..." re
-    else
-        LOG "private tool key exist!"
-        key=$(cat ~/.key.txt)
-    fi
+    ./script_update.sh -d -r
 
-
-    # console tool
-    if [[ "$INSTALL_PRIVATE_CONSOLE_TOOL" == "Y" && "$key" != "none" ]]
-    then
-        LOG "Install console tool"
-
-        wget https://github.com/yuansco/scripts/raw/main/console_tool.zip
-
-        if [ ! -f ./console_tool.zip ]; then
-            LOG_W "Download fail!"
-        else
-            unzip -P $key ./console_tool.zip
-            chmod a+x ~/workspace/console_tool.sh
-            echo "alias console='~/workspace/console_tool.sh'" >> ~/.bashrc
-            source ~/.bashrc
-
-            re=$(~/workspace/console_tool.sh -V |grep "Script Version")
-            if [[ "$re" != "" ]]
-            then
-                LOG "Install Done"
-            else
-                LOG_W "Install fail!"
-            fi
-            rm -f ./console_tool.zip
-        fi
-    fi
-
-    # cpfe/extract.sh
-    if [[ "$INSTALL_PRIVATE_EXTRACT_TOOL" == "Y" && "$key" != "none" ]]
-    then
-        LOG "Install extract tool"
-
-        wget https://github.com/yuansco/scripts/raw/main/extract.zip
-
-        if [ ! -f ./extract.zip ]; then
-            LOG_W "Download fail!"
-        else
-            unzip -P $key ./extract.zip
-            mv ./extract.sh ~/workspace/cpfe/extract.sh
-            chmod a+x ~/workspace/cpfe/extract.sh
-            rm -f ./extract.zip
-        fi
-    fi
-
-    # cpfe/flashdisk.sh
-    if [[ "$INSTALL_PRIVATE_FLASHDISK_TOOL" == "Y" && "$key" != "none" ]]
-    then
-        LOG "Install flashdisk tool"
-
-        wget https://github.com/yuansco/scripts/raw/main/flashdisk.zip
-
-            if [ ! -f ./flashdisk.zip ]; then
-            LOG_W "Download fail!"
-        else
-            unzip -P $key ./flashdisk.zip
-            mkdir -p ~/Downloads/cpfe
-            mv ./flashdisk.sh ~/workspace/cpfe/flashdisk.sh
-            chmod a+x ~/workspace/cpfe/extract.sh
-            rm -f ./flashdisk.zip
-        fi
-    fi
+    rm -f ./script_update.sh
 fi
 
 #############################################
