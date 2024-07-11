@@ -190,6 +190,20 @@ fi
 
 
 #############################################
+# check internet connection                 #
+#############################################
+
+# ping google dns server
+internet_ok=$(ping 8.8.8.8 -c 1 |grep "0% packet loss")
+
+if [[ "$internet_ok" == "" ]]
+then
+    LOG_W "internet connection check fail!"
+    read -p "press any key to continue..." re
+fi
+
+
+#############################################
 # print configs                             #
 #############################################
 
@@ -449,16 +463,32 @@ fi
 
 if [[ "$install_tool" == "Y" ]]
 then
+
     LOG "Start to install private tool..."
 
     LOG "zip key: $ZIPKEY"
 
-    wget https://raw.githubusercontent.com/yuansco/scripts/main/script_update.sh
+    # if we don't have whole repo, download expand script from github
+    # this allows the script can running individually
+    if [ ! -f ./script_update.sh ]
+    then
+        wget https://raw.githubusercontent.com/yuansco/scripts/main/script_update.sh
+        script_expand="Y"
+    fi
+
     chmod a+x ./script_update.sh
 
+    # download and release scripts
     ./script_update.sh -d -r
 
-    rm -f ./script_update.sh
+    # clean up zip file
+    ./script_update.sh -c
+
+    # remove expand script
+    if [[ "$script_expand" == "Y" ]]
+    then
+        rm -f ./script_update.sh
+    fi
 fi
 
 #############################################

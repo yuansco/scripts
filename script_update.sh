@@ -1,11 +1,11 @@
 #!/bin/bash
-# Backup and update scripts
+# Download, Update and Backup scripts
 # https://github.com/yuansco/scripts
 # Vertion: 1.0
 #
 # How to use:
 #
-#   (1) install:
+#   (1) install scripts:
 #
 #      git clone https://github.com/yuansco/scripts.git && cd scripts
 #      ./setup_key.sh $KEY
@@ -102,6 +102,15 @@ do
         wget https://github.com/yuansco/scripts/raw/main/flashdisk.zip
 
         echo "script download finish!"
+
+    # clean up
+    elif [[ "$i" == "-c" ]]
+    then
+
+        rm -rf ./console_tool.zip
+        rm -rf ./extract.zip
+        rm -rf ./flashdisk.zip
+
     else
         echo "Invalid option: $1"
     fi
