@@ -177,7 +177,7 @@ then
     # this script only verified on Ubuntu 22.04 LTS, 
     # show the warning message if run in not verified version.
     LOG_W "Wronging! This script only verified on Ubuntu 22.04."
-    
+
     # check user input to continue
     read -p "press y to continue..." re
     echo
@@ -473,21 +473,22 @@ then
     if [ ! -f ./script_update.sh ]
     then
         wget https://raw.githubusercontent.com/yuansco/scripts/main/script_update.sh
-        script_expand="Y"
     fi
 
-    chmod a+x ./script_update.sh
-
-    # download and release scripts
-    ./script_update.sh -d -r
-
-    # clean up zip file
-    ./script_update.sh -c
-
-    # remove expand script
-    if [[ "$script_expand" == "Y" ]]
+    if [ -f ./script_update.sh ]
     then
+        chmod a+x ./script_update.sh
+
+        # download and release scripts
+        ./script_update.sh -d -r
+
+        # clean up zip file
+        ./script_update.sh -c
+
+        # remove expand script
         rm -f ./script_update.sh
+    else
+        LOG_W "download expand script fail!"
     fi
 fi
 
