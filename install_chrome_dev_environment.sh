@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/05/17
+# Last modified on 2024/07/18
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -338,7 +338,10 @@ then
     \"editor.fontFamily\": \"Consolas, 'Courier New', monospace\",
     \"editor.mouseWheelZoom\": true,
     \"editor.tabSize\": 8,
-    \"window.zoomLevel\": 1.2
+    \"window.zoomLevel\": 1.2,
+    \"github.gitAuthentication\": false,
+    \"git.terminalAuthentication\": false,
+    \"C_Cpp.workspaceParsingPriority\": \"low\"
 }"
     echo "$settings" > ~/.config/Code/User/settings.json
 
@@ -640,8 +643,7 @@ then
     re=$(sudo docker run hello-world|grep "Hello from Docker!")
     if [[ "$re" == "" ]]
     then
-        LOG "Install Docker Engine fail!"
-        exit 0
+        LOG_E "Install Docker Engine fail!"
     fi
 
     # Setup run Docker without sudo
@@ -687,8 +689,8 @@ then
         LOG_E "import docker fail: $re"
     fi
 
-    echo "Config Servod Done!"
+    LOG "Config Servod Done!"
 
 fi
 
-echo "Install Finish!"
+LOG "Install Finish!"
