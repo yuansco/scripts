@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/07/18
+# Last modified on 2024/08/14
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -41,6 +41,11 @@ INSTALL_DEV_TOOL="Y"            # chromium releate tools
 # TODO: (2) turn on sync tast-tests-private repo if needed
 SYNC_TAST_TESTS_PRIVATE="N"
 
+# sync strauss repo
+# Note: config gerrit ssh key is necessary for sync private repo
+# TODO: (3) turn on sync strauss repo if needed
+SYNC_STRAUSS="N"
+
 
 # Chroot config:
 CHROOT_REPO_INIT="Y"            # init repo folder
@@ -48,7 +53,7 @@ CHROOT_REPO_SYNC="Y"            # sync source code
 CHROOT_SYNC_JOBS=8              # allow N jobs at repo sync
 CHROOT_CREATE="Y"               # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"          # run setup board after create chroot
-# TODO: (3) select a baseboard name for setup_board, default is nissa
+# TODO: (4) select a baseboard name for setup_board, default is nissa
 CHROOT_TATGET_BOARD="nissa"     # baseboard for setup_board command
 
 # Setup docker Servod
@@ -70,8 +75,7 @@ SETUP_DOCKER_SERVOD="Y"
 # https://chrome-internal-review.googlesource.com/settings/#HTTPCredentials
 # HTTP Credentials > Obtain password (opens in a new tab) > Configure Git
 
-# TODO: (4) config your gerrit ssh key and turn on ssh_key="Y" if needed
-ssh_key="N"
+# TODO: (5) Add your gerrit ssh key if needed
 
 # Chromium Gerrit key:
 function chromium_gerrit_key(){
@@ -86,12 +90,20 @@ function chromium_internal_gerrit_key(){
 }
 
 function setup_ssh_key(){
-    chromium_gerrit_key
-    chromium_internal_gerrit_key
 
     FILE=~/.gitcookies
     if [ -f "$FILE" ]; then
+        LOG "ssh key is ready"
+        have_ssh_key="Y"
+        return
+    fi
+
+    chromium_gerrit_key
+    chromium_internal_gerrit_key
+
+    if [ -f "$FILE" ]; then
         LOG "Setup ssh key done"
+        have_ssh_key="Y"
     else
         LOG_W "Setup ssh key fail! Please check ssh_key"
     fi
@@ -227,6 +239,7 @@ Chroot dev tools: $INSTALL_DEV_TOOL
 Chroot repo sync: $CHROOT_REPO_SYNC
 Chroot sync jobs: $CHROOT_SYNC_JOBS
 Chroot sync tast-tests-private repo: $SYNC_TAST_TESTS_PRIVATE
+Chroot sync strauss repo: $SYNC_STRAUSS
 Chroot run cros_sdk: $CHROOT_CREATE
 Chroot run setup_board: $CHROOT_SETUP_BOARD
 Chroot setup_board target: $CHROOT_SETUP_BOARD
@@ -285,6 +298,7 @@ then
 fi
 
 source ~/.bashrc
+
 
 #############################################
 # Install useful tool
@@ -539,6 +553,10 @@ then
     repo init -u https://chromium.googlesource.com/chromiumos/manifest -b stable
 fi
 
+# setup gerrit ssh key
+LOG "Setup ssh key..."
+setup_ssh_key
+
 # Get private repo tast-tests-private
 # internal gerrit ssh key is necessary for sync private repo
 
@@ -561,21 +579,36 @@ name=\"chromeos/platform/tast-tests-private\" />
 "
 
 # setup ssh key and sync tast-tests-private repo
-if [[ "$SYNC_TAST_TESTS_PRIVATE" == "Y" && "$ssh_key" == "Y" ]]
+if [[ "$SYNC_TAST_TESTS_PRIVATE" == "Y" && "$have_ssh_key" == "Y" ]]
 then
 
-    LOG "Try to sync tast-tests-private repo"
-
-    # setup ssh key
-    LOG "Setup ssh key..."
-    setup_ssh_key
-
     # Add tast-tests-private in local_manifests
-    LOG "Add tast-tests-private in local_manifests"
+    LOG "Add tast-tests-private repo in local_manifests"
     mkdir -p ~/chromiumos/.repo/local_manifests
     touch ~/chromiumos/.repo/local_manifests/tast-tests-private.xml
     echo "$private_repo_xml" > ~/chromiumos/.repo/local_manifests/tast-tests-private.xml
+fi
 
+# Get private repo strauss
+# internal gerrit ssh key is necessary for sync private repo
+
+strauss_xml="<manifest>
+  <project remote=\"cros-internal\"
+           path=\"src/platform/feature-x/strauss/ec\"
+           name=\"chromeos/platform/strauss/ec\"
+           groups=\"firmware\" />
+</manifest>
+"
+
+# setup ssh key and sync strauss repo
+if [[ "$SYNC_STRAUSS" == "Y" && "$have_ssh_key" == "Y" ]]
+then
+
+    # Add strauss in local_manifests
+    LOG "Add strauss repo in local_manifests"
+    mkdir -p ~/chromiumos/.repo/local_manifests
+    touch ~/chromiumos/.repo/local_manifests/strauss.xml
+    echo "$strauss_xml" > ~/chromiumos/.repo/local_manifests/strauss.xml
 fi
 
 # sync source code
@@ -604,6 +637,18 @@ mkdir -p ~/chromiumos/src/myfile
 mkdir -p ~/chromiumos/src/myfile/firmware
 mkdir -p ~/chromiumos/src/myfile/cbi
 mkdir -p ~/chromiumos/src/myfile/scripts
+
+
+# Always show debug logs when building ec firmware through zmake
+# Add environment variables in cros_sdk's bashrc
+
+FILE="$HOME/chromiumos/out/home/$USER/.bashrc"
+if [ -f "$FILE" ]; then
+    LOG "Setup alias zmake"
+    echo "alias zmake='zmake -l DEBUG'" >> $FILE
+else
+    LOG_W "Setup alias zmake fail, $FILE not exists!"
+fi
 
 
 #############################################
