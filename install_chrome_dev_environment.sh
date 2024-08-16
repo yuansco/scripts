@@ -263,7 +263,7 @@ fi
 
 config_rm=$(cat ~/.bashrc |grep rm)
 
-if [[ "$config_scp" == "" ]]
+if [[ "$config_rm" == "" ]]
 then
     echo "alias rm='rm -i'" >> ~/.bashrc
 fi
