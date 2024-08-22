@@ -726,7 +726,7 @@ then
 
     # install python3-docker and
     # check python able to import docker class
-    sudo apt install python3-docker
+    sudo apt install -y python3-docker
     LOG "Test import docker in python3..."
     re=$(echo "import docker" | python3)
     if [[ "$re" != "" ]]
