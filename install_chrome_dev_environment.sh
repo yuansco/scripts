@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/08/14
+# Last modified on 2024/08/23
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -108,6 +108,18 @@ function setup_ssh_key(){
         LOG_W "Setup ssh key fail! Please check ssh_key"
     fi
 }
+
+
+#############################################
+# load defconfig                            #
+#############################################
+
+FILE=./defconfig.sh
+
+if [ -f "$FILE" ]; then
+    LOG "loading defconfig"
+    source ./defconfig.sh
+fi
 
 
 #############################################
