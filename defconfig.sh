@@ -2,7 +2,7 @@
 # defconfig.sh
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2024/08/23
+# Last modified on 2024/08/27
 # Vertion: 1.0
 
 #############################################
@@ -11,7 +11,7 @@
 
 # User name and email address for setup git
 # TODO: (1) update your name amd mail
-USEREMAL="foo@quanta.corp-partner.google.com"
+USEREMAL="foo@gmail.com"
 USERNAME="foo"
 
 
@@ -46,11 +46,18 @@ SYNC_STRAUSS="N"
 
 
 # Chroot config:
-CHROOT_REPO_INIT="Y"            # init repo folder
-CHROOT_REPO_SYNC="Y"            # sync source code
-CHROOT_SYNC_JOBS=8              # allow N jobs at repo sync
-CHROOT_CREATE="Y"               # create chroot after repo sync
-CHROOT_SETUP_BOARD="Y"          # run setup board after create chroot
+CHROOT_REPO_INIT="Y"                          # init repo folder
+
+# all branch: https://chromium.googlesource.com/chromiumos/manifest.git/+refs
+CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
+#CHROOT_REPO_BRANCH="main"                    # main branch
+#CHROOT_REPO_BRANCH="release-R128-15964.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R129-16002.B"    # release branch
+
+CHROOT_REPO_SYNC="Y"                          # sync source code
+CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
+CHROOT_CREATE="Y"                             # create chroot after repo sync
+CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
 
 # TODO: (4) select a baseboard name for setup_board, default is nissa
 CHROOT_TATGET_BOARD="nissa"     # baseboard for setup_board command
@@ -60,29 +67,27 @@ SETUP_DOCKER_SERVOD="Y"
 
 
 #############################################
-# gerrit ssh key                            #
+# Gerrit HTTP Credentials                   #
 #############################################
 
 #
-# Chromium Gerrit key:
+# Chromium Gerrit HTTP Credentials:
 # https://chromium-review.googlesource.com/settings/#HTTPCredentials
 # HTTP Credentials > Obtain password (opens in a new tab) > Configure Git
 #
-# Chromium Internal Gerrit key:
+# Chromium Internal Gerrit HTTP Credentials:
 # https://chrome-internal-review.googlesource.com/settings/#HTTPCredentials
 # HTTP Credentials > Obtain password (opens in a new tab) > Configure Git
 
-# TODO: (5) Add your gerrit ssh key if needed
+# TODO: (5) Add your Gerrit HTTP Credentials if needed
 
-# Chromium Gerrit key:
 function chromium_gerrit_key(){
-    # TODO
+    # TODO: paste your Gerrit HTTP Credentials here
     return
 }
 
-# Chromium Internal Gerrit key:
 function chromium_internal_gerrit_key(){
-    # TODO
+    # TODO: paste your Internal Gerrit HTTP Credentials here
     return
 }
 

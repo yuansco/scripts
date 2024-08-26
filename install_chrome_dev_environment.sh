@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/08/23
+# Last modified on 2024/08/27
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -13,7 +13,7 @@
 
 # User name and email address for setup git
 # TODO: (1) update your name amd mail
-USEREMAL="foo@quanta.corp-partner.google.com"
+USEREMAL="foo@gmail.com"
 USERNAME="foo"
 
 
@@ -37,22 +37,30 @@ INSTALL_DEV_TOOL="Y"            # chromium releate tools
 
 
 # sync tast-tests-private repo
-# Note: config gerrit ssh key is necessary for sync private repo
+# Note: config gerrit key is necessary for sync private repo
 # TODO: (2) turn on sync tast-tests-private repo if needed
 SYNC_TAST_TESTS_PRIVATE="N"
 
 # sync strauss repo
-# Note: config gerrit ssh key is necessary for sync private repo
+# Note: config gerrit key is necessary for sync private repo
 # TODO: (3) turn on sync strauss repo if needed
 SYNC_STRAUSS="N"
 
 
 # Chroot config:
-CHROOT_REPO_INIT="Y"            # init repo folder
-CHROOT_REPO_SYNC="Y"            # sync source code
-CHROOT_SYNC_JOBS=8              # allow N jobs at repo sync
-CHROOT_CREATE="Y"               # create chroot after repo sync
-CHROOT_SETUP_BOARD="Y"          # run setup board after create chroot
+CHROOT_REPO_INIT="Y"                          # init repo folder
+
+# all branch: https://chromium.googlesource.com/chromiumos/manifest.git/+refs
+CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
+#CHROOT_REPO_BRANCH="main"                    # main branch
+#CHROOT_REPO_BRANCH="release-R128-15964.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R129-16002.B"    # release branch
+
+CHROOT_REPO_SYNC="Y"                          # sync source code
+CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
+CHROOT_CREATE="Y"                             # create chroot after repo sync
+CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
+
 # TODO: (4) select a baseboard name for setup_board, default is nissa
 CHROOT_TATGET_BOARD="nissa"     # baseboard for setup_board command
 
@@ -61,40 +69,36 @@ SETUP_DOCKER_SERVOD="Y"
 
 
 #############################################
-# Internal gerrit ssh key                   #
+# Gerrit HTTP Credentials                   #
 #############################################
 
-# Internal gerrit ssh key
-# for download private repo, e.g. tast-tests-private
 #
-# Chromium Gerrit key:
+# Chromium Gerrit HTTP Credentials:
 # https://chromium-review.googlesource.com/settings/#HTTPCredentials
 # HTTP Credentials > Obtain password (opens in a new tab) > Configure Git
 #
-# Chromium Internal Gerrit key:
+# Chromium Internal Gerrit HTTP Credentials:
 # https://chrome-internal-review.googlesource.com/settings/#HTTPCredentials
 # HTTP Credentials > Obtain password (opens in a new tab) > Configure Git
 
-# TODO: (5) Add your gerrit ssh key if needed
+# TODO: (5) Add your Gerrit HTTP Credentials if needed
 
-# Chromium Gerrit key:
 function chromium_gerrit_key(){
-    # TODO
+    # TODO: paste your Gerrit HTTP Credentials here
     return
 }
 
-# Chromium Internal Gerrit key:
 function chromium_internal_gerrit_key(){
-    # TODO
+    # TODO: paste your Internal Gerrit HTTP Credentials here
     return
 }
 
-function setup_ssh_key(){
+function setup_gerrit_key(){
 
     FILE=~/.gitcookies
     if [ -f "$FILE" ]; then
-        LOG "ssh key is ready"
-        have_ssh_key="Y"
+        LOG "gerrit key is ready"
+        have_gerrit_key="Y"
         return
     fi
 
@@ -102,24 +106,12 @@ function setup_ssh_key(){
     chromium_internal_gerrit_key
 
     if [ -f "$FILE" ]; then
-        LOG "Setup ssh key done"
-        have_ssh_key="Y"
+        LOG "Setup gerrit key done"
+        have_gerrit_key="Y"
     else
-        LOG_W "Setup ssh key fail! Please check ssh_key"
+        LOG_W "Setup gerrit key fail! Please check gerrit key"
     fi
 }
-
-
-#############################################
-# load defconfig                            #
-#############################################
-
-FILE=./defconfig.sh
-
-if [ -f "$FILE" ]; then
-    LOG "loading defconfig"
-    source ./defconfig.sh
-fi
 
 
 #############################################
@@ -224,6 +216,18 @@ if [[ "$internet_ok" == "" ]]
 then
     LOG_W "internet connection check fail!"
     read -p "press any key to continue..." re
+fi
+
+
+#############################################
+# load defconfig                            #
+#############################################
+
+FILE=./defconfig.sh
+
+if [ -f "$FILE" ]; then
+    LOG "loading defconfig"
+    source ./defconfig.sh
 fi
 
 
@@ -562,15 +566,15 @@ export PATH=$PATH:~/depot_tools
 
 if [[ "$CHROOT_REPO_INIT" == "Y" ]]
 then
-    repo init -u https://chromium.googlesource.com/chromiumos/manifest -b stable
+    repo init -u https://chromium.googlesource.com/chromiumos/manifest -b $CHROOT_REPO_BRANCH
 fi
 
-# setup gerrit ssh key
-LOG "Setup ssh key..."
-setup_ssh_key
+# setup gerrit gerrit key
+LOG "Setup gerrit key..."
+setup_gerrit_key
 
 # Get private repo tast-tests-private
-# internal gerrit ssh key is necessary for sync private repo
+# internal gerrit key is necessary for sync private repo
 
 private_repo_xml="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <manifest>
@@ -590,8 +594,8 @@ name=\"chromeos/platform/tast-tests-private\" />
 </manifest>
 "
 
-# setup ssh key and sync tast-tests-private repo
-if [[ "$SYNC_TAST_TESTS_PRIVATE" == "Y" && "$have_ssh_key" == "Y" ]]
+# sync tast-tests-private repo
+if [[ "$SYNC_TAST_TESTS_PRIVATE" == "Y" && "$have_gerrit_key" == "Y" ]]
 then
 
     # Add tast-tests-private in local_manifests
@@ -602,7 +606,7 @@ then
 fi
 
 # Get private repo strauss
-# internal gerrit ssh key is necessary for sync private repo
+# internal gerrit key is necessary for sync private repo
 
 strauss_xml="<manifest>
   <project remote=\"cros-internal\"
@@ -612,8 +616,8 @@ strauss_xml="<manifest>
 </manifest>
 "
 
-# setup ssh key and sync strauss repo
-if [[ "$SYNC_STRAUSS" == "Y" && "$have_ssh_key" == "Y" ]]
+# sync strauss repo
+if [[ "$SYNC_STRAUSS" == "Y" && "$have_gerrit_key" == "Y" ]]
 then
 
     # Add strauss in local_manifests
@@ -751,3 +755,4 @@ then
 fi
 
 LOG "Install Finish!"
+
