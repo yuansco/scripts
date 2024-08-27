@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/08/27
+# Last modified on 2024/08/28
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -11,16 +11,19 @@
 # Config                                    #
 #############################################
 
-# User name and email address for setup git
-# TODO: (1) update your name amd mail
-USEREMAL="foo@gmail.com"
-USERNAME="foo"
+# User name and email address for setup git ("Y" or other):
+# Note: It is necessary for sync source code repo
+SETUP_GIT_USER_INFO="Y"
+
+# TODO: (1) update your name amd mail if needed
+GIT_USER_EMAIL="foo@gmail.com"
+GIT_USER_NAME="foo"
 
 
 # run apt-get update and apt-get upgrade before install
 UPDATE_UBUNTU="Y"
 
-# Install useful tool config("Y" or other):
+# Install useful tool config ("Y" or other):
 INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser
 INSTALL_VSCODE="Y"              # Visual Studio Code
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
@@ -32,23 +35,14 @@ INSTALL_NETTOOL="Y"             # Net-tool (for ifconfig command)
 INSTALL_GHEX="Y"                # Ghex (hex editor)
 INSTALL_TREE="Y"                # Tree (for tree command)
 INSTALL_SCREENSHOT="Y"          # Gnome-Screenshot (screenshot tool)
-INSTALL_CHEWING="Y"             # Chewing (Chinese Input Method)
-INSTALL_DEV_TOOL="Y"            # chromium releate tools
-
-
-# sync tast-tests-private repo
-# Note: config gerrit key is necessary for sync private repo
-# TODO: (2) turn on sync tast-tests-private repo if needed
-SYNC_TAST_TESTS_PRIVATE="N"
-
-# sync strauss repo
-# Note: config gerrit key is necessary for sync private repo
-# TODO: (3) turn on sync strauss repo if needed
-SYNC_STRAUSS="N"
+INSTALL_CHEWING="Y"             # Chewing (Chinese input method)
+INSTALL_WINE="Y"                # Wine (for run Windows applications)
 
 
 # Chroot config:
+CHROOT_DEV_TOOL="Y"                           # Chromium development tools
 CHROOT_REPO_INIT="Y"                          # init repo folder
+CHROOT_REPO_FOLDER="chromiumos"               # init folder name, default is ~/chromiumos/
 
 # all branch: https://chromium.googlesource.com/chromiumos/manifest.git/+refs
 CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
@@ -61,8 +55,16 @@ CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
 CHROOT_CREATE="Y"                             # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
 
-# TODO: (4) select a baseboard name for setup_board, default is nissa
-CHROOT_TATGET_BOARD="nissa"     # baseboard for setup_board command
+# sync tast-tests-private repo
+# Note: config gerrit key is necessary for sync private repo
+CHROOT_SYNC_TAST_TESTS_PRIVATE="N"
+
+# sync strauss repo
+# Note: config gerrit key is necessary for sync private repo
+CHROOT_SYNC_STRAUSS="N"
+
+# TODO: (2) select a baseboard name for setup_board, default is nissa
+CHROOT_TATGET_BOARD="nissa"                   # baseboard for setup_board command
 
 # Setup docker Servod
 SETUP_DOCKER_SERVOD="Y"
@@ -81,7 +83,7 @@ SETUP_DOCKER_SERVOD="Y"
 # https://chrome-internal-review.googlesource.com/settings/#HTTPCredentials
 # HTTP Credentials > Obtain password (opens in a new tab) > Configure Git
 
-# TODO: (5) Add your Gerrit HTTP Credentials if needed
+# TODO: (3) Add your Gerrit HTTP Credentials if needed
 
 function chromium_gerrit_key(){
     # TODO: paste your Gerrit HTTP Credentials here
@@ -109,7 +111,7 @@ function setup_gerrit_key(){
         LOG "Setup gerrit key done"
         have_gerrit_key="Y"
     else
-        LOG_W "Setup gerrit key fail! Please check gerrit key"
+        LOG_W "gerrit key not found! Please check gerrit key if you want to sync private repo"
     fi
 }
 
@@ -209,8 +211,8 @@ fi
 # check internet connection                 #
 #############################################
 
-# ping google dns server
-internet_ok=$(ping 8.8.8.8 -c 1 |grep "0% packet loss")
+# ping google source code server
+internet_ok=$(ping chromium.googlesource.com -c 1 |grep "0% packet loss")
 
 if [[ "$internet_ok" == "" ]]
 then
@@ -236,10 +238,10 @@ fi
 #############################################
 
 
-LOG "Script Configs:"
+LOG "Script Configs: (Y or other)"
 echo "
-Config Git user name: $USEREMAL
-Config Git user mail: $USERNAME
+Config Git user name: $GIT_USER_EMAIL
+Config Git user mail: $GIT_USER_NAME
 Run apt update and upgrade: $UPDATE_UBUNTU
 Install Google Chrome Browser: $INSTALL_CHROME_BROWSER
 Install Visual Studio Code: $INSTALL_VSCODE
@@ -251,11 +253,13 @@ Install Gparted: $INSTALL_GPARTED
 Install Net-tool: $INSTALL_NETTOOL
 Install Tree: $INSTALL_TREE
 Install Gnome-Screenshot: $INSTALL_SCREENSHOT
-Chroot dev tools: $INSTALL_DEV_TOOL
+Install Chewing: $INSTALL_CHEWING
+Install Wine: $INSTALL_WINE
+Chroot dev tools: $CHROOT_DEV_TOOL
 Chroot repo sync: $CHROOT_REPO_SYNC
 Chroot sync jobs: $CHROOT_SYNC_JOBS
-Chroot sync tast-tests-private repo: $SYNC_TAST_TESTS_PRIVATE
-Chroot sync strauss repo: $SYNC_STRAUSS
+Chroot sync tast-tests-private repo: $CHROOT_SYNC_TAST_TESTS_PRIVATE
+Chroot sync strauss repo: $CHROOT_SYNC_STRAUSS
 Chroot run cros_sdk: $CHROOT_CREATE
 Chroot run setup_board: $CHROOT_SETUP_BOARD
 Chroot setup_board target: $CHROOT_SETUP_BOARD
@@ -311,6 +315,15 @@ config_nano=$(cat ~/.bashrc |grep gitlog)
 if [[ "$config_gitlog" == "" ]]
 then
     echo "alias gitlog='git log --pretty=oneline'" >> ~/.bashrc
+fi
+
+# Use ch to quickly enter cros_sdk
+
+config_ch=$(cat ~/.bashrc |grep ch=)
+
+if [[ "$config_ch" == "" ]]
+then
+    echo "alias ch='cd ~/$CHROOT_REPO_FOLDER;cros_sdk --no-ns-pid'" >> ~/.bashrc
 fi
 
 source ~/.bashrc
@@ -473,6 +486,12 @@ then
     sudo apt install -y ibus-chewing
 fi
 
+if [[ "$INSTALL_WINE" == "Y" ]]
+then
+    LOG "Install Wine"
+    sudo apt-get install -y wine
+fi
+
 #############################################
 # Install private tool
 # e.g. console tool, extract and flashdisk
@@ -531,23 +550,21 @@ fi
 #############################################
 
 cd ~
-if [[ "$INSTALL_DEV_TOOL" == "Y" ]]
+if [[ "$CHROOT_DEV_TOOL" == "Y" ]]
 then
     LOG "Start to install development tool..."
     sudo add-apt-repository universe
     sudo apt-get install -y git gitk git-gui curl xz-utils
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
     echo "export PATH=$PATH:~/depot_tools" >> ~/.bashrc
-    # If you plan to work with chroot frequently, Adding an alias to enter chroot will be convenient.
-    echo "alias ch='cd ~/chromiumos;cros_sdk --no-ns-pid'" >> ~/.bashrc
-    source ~/.bashrc
-    git config --global user.email $USEREMAL
-    git config --global user.name $USERNAME
-    mkdir -p ~/chromiumos
-    cd ~/chromiumos
 fi
 
-
+if [[ "$SETUP_GIT_USER_INFO" == "Y" ]]
+then
+    LOG "Setup git user name and email"
+    git config --global user.email $GIT_USER_EMAIL
+    git config --global user.name $GIT_USER_NAME
+fi
 
 #############################################
 # Start to download source code and build chroot
@@ -555,6 +572,9 @@ fi
 #############################################
 
 LOG "Start to download source code and build chroot..."
+
+mkdir -p ~/$CHROOT_REPO_FOLDER
+cd ~/$CHROOT_REPO_FOLDER
 
 # 
 # 'source ~/.bashrc' will not working in same script
@@ -595,14 +615,14 @@ name=\"chromeos/platform/tast-tests-private\" />
 "
 
 # sync tast-tests-private repo
-if [[ "$SYNC_TAST_TESTS_PRIVATE" == "Y" && "$have_gerrit_key" == "Y" ]]
+if [[ "$CHROOT_SYNC_TAST_TESTS_PRIVATE" == "Y" && "$have_gerrit_key" == "Y" ]]
 then
 
     # Add tast-tests-private in local_manifests
     LOG "Add tast-tests-private repo in local_manifests"
-    mkdir -p ~/chromiumos/.repo/local_manifests
-    touch ~/chromiumos/.repo/local_manifests/tast-tests-private.xml
-    echo "$private_repo_xml" > ~/chromiumos/.repo/local_manifests/tast-tests-private.xml
+    mkdir -p ~/$CHROOT_REPO_FOLDER/.repo/local_manifests
+    touch ~/$CHROOT_REPO_FOLDER/.repo/local_manifests/tast-tests-private.xml
+    echo "$private_repo_xml" > ~/$CHROOT_REPO_FOLDER/.repo/local_manifests/tast-tests-private.xml
 fi
 
 # Get private repo strauss
@@ -617,14 +637,14 @@ strauss_xml="<manifest>
 "
 
 # sync strauss repo
-if [[ "$SYNC_STRAUSS" == "Y" && "$have_gerrit_key" == "Y" ]]
+if [[ "$CHROOT_SYNC_STRAUSS" == "Y" && "$have_gerrit_key" == "Y" ]]
 then
 
     # Add strauss in local_manifests
     LOG "Add strauss repo in local_manifests"
-    mkdir -p ~/chromiumos/.repo/local_manifests
-    touch ~/chromiumos/.repo/local_manifests/strauss.xml
-    echo "$strauss_xml" > ~/chromiumos/.repo/local_manifests/strauss.xml
+    mkdir -p ~/$CHROOT_REPO_FOLDER/.repo/local_manifests
+    touch ~/$CHROOT_REPO_FOLDER/.repo/local_manifests/strauss.xml
+    echo "$strauss_xml" > ~/$CHROOT_REPO_FOLDER/.repo/local_manifests/strauss.xml
 fi
 
 # sync source code
@@ -649,16 +669,16 @@ then
 fi
 
 # Setup folder tree
-mkdir -p ~/chromiumos/src/myfile
-mkdir -p ~/chromiumos/src/myfile/firmware
-mkdir -p ~/chromiumos/src/myfile/cbi
-mkdir -p ~/chromiumos/src/myfile/scripts
+mkdir -p ~/$CHROOT_REPO_FOLDER/src/myfile
+mkdir -p ~/$CHROOT_REPO_FOLDER/src/myfile/firmware
+mkdir -p ~/$CHROOT_REPO_FOLDER/src/myfile/cbi
+mkdir -p ~/$CHROOT_REPO_FOLDER/src/myfile/scripts
 
 
 # Always show debug logs when building ec firmware through zmake
 # Add environment variables in cros_sdk's bashrc
 
-FILE="$HOME/chromiumos/out/home/$USER/.bashrc"
+FILE="$HOME/$CHROOT_REPO_FOLDER/out/home/$USER/.bashrc"
 if [ -f "$FILE" ]; then
     LOG "Setup alias zmake"
     echo "alias zmake='zmake -l DEBUG'" >> $FILE
@@ -678,7 +698,7 @@ then
     LOG "Setup docker Servod"
 
     # Add hdctools path to $PATH
-    echo "export PATH=~/chromiumos/src/third_party/hdctools/scripts:$PATH" >> ~/.bashrc
+    echo "export PATH=~/$CHROOT_REPO_FOLDER/src/third_party/hdctools/scripts:$PATH" >> ~/.bashrc
     source ~/.bashrc
 
     #  Install Docker Engine on Ubuntu

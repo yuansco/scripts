@@ -2,14 +2,14 @@
 # chrome auto install script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2024/08/27
+# Last modified on 2024/08/28
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
 
 
-# ping google dns server
-internet_ok=$(ping 8.8.8.8 -c 1 |grep "0% packet loss")
+# ping github.com
+internet_ok=$(ping github.com -c 1 |grep "0% packet loss")
 
 if [[ "$internet_ok" == "" ]]
 then
