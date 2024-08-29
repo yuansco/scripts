@@ -2,16 +2,16 @@
 # defconfig.sh
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2024/08/28
+# Last modified on 2024/08/29
 # Vertion: 1.0
 
 #############################################
 # Config                                    #
 #############################################
 
-# User name and email address for setup git ("Y" or other):
-# Note: It is necessary for sync source code repo
-SETUP_GIT_USER_INFO="Y"
+# Set the git global config, including username and email ("Y" or other):
+# Note: It is necessary for download source code
+SETUP_GIT_GLOBAL_CONFIG="Y"
 
 # TODO: (1) update your name amd mail if needed
 GIT_USER_EMAIL="foo@gmail.com"
@@ -53,6 +53,9 @@ CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
 CHROOT_CREATE="Y"                             # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
 
+# TODO: (2) select a baseboard name for setup_board, default is nissa
+CHROOT_TATGET_BOARD="nissa"                   # baseboard for setup_board command
+
 # sync tast-tests-private repo
 # Note: config gerrit key is necessary for sync private repo
 CHROOT_SYNC_TAST_TESTS_PRIVATE="N"
@@ -61,10 +64,8 @@ CHROOT_SYNC_TAST_TESTS_PRIVATE="N"
 # Note: config gerrit key is necessary for sync private repo
 CHROOT_SYNC_STRAUSS="N"
 
-# TODO: (2) select a baseboard name for setup_board, default is nissa
-CHROOT_TATGET_BOARD="nissa"                   # baseboard for setup_board command
-
 # Setup docker Servod
+# https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/main/docs/servod_outside_chroot.md
 SETUP_DOCKER_SERVOD="Y"
 
 

@@ -8,6 +8,6 @@ chmod a+x ./chrome_auto_install.sh
 ./chrome_auto_install.sh
 source ~/.bashrc
 ```
-Note 1: This script is not a fully automated installation as some command may require entering [Y] or [Enter].
+Note 1: This script is not a fully automated installation as some commands may require entering [Y] or user password.
 
 Note 2: Please run the script on Ubuntu 22.04. The newer OS version could potentially work, but it's not guaranteed.

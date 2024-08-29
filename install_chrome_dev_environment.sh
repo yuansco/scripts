@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/08/28
+# Last modified on 2024/08/29
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -11,9 +11,9 @@
 # Config                                    #
 #############################################
 
-# User name and email address for setup git ("Y" or other):
-# Note: It is necessary for sync source code repo
-SETUP_GIT_USER_INFO="Y"
+# Set the git global config, including username and email ("Y" or other):
+# Note: It is necessary for download source code
+SETUP_GIT_GLOBAL_CONFIG="Y"
 
 # TODO: (1) update your name amd mail if needed
 GIT_USER_EMAIL="foo@gmail.com"
@@ -55,6 +55,9 @@ CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
 CHROOT_CREATE="Y"                             # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
 
+# TODO: (2) select a baseboard name for setup_board, default is nissa
+CHROOT_TATGET_BOARD="nissa"                   # baseboard for setup_board command
+
 # sync tast-tests-private repo
 # Note: config gerrit key is necessary for sync private repo
 CHROOT_SYNC_TAST_TESTS_PRIVATE="N"
@@ -63,10 +66,8 @@ CHROOT_SYNC_TAST_TESTS_PRIVATE="N"
 # Note: config gerrit key is necessary for sync private repo
 CHROOT_SYNC_STRAUSS="N"
 
-# TODO: (2) select a baseboard name for setup_board, default is nissa
-CHROOT_TATGET_BOARD="nissa"                   # baseboard for setup_board command
-
 # Setup docker Servod
+# https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/main/docs/servod_outside_chroot.md
 SETUP_DOCKER_SERVOD="Y"
 
 
@@ -326,8 +327,6 @@ then
     echo "alias ch='cd ~/$CHROOT_REPO_FOLDER;cros_sdk --no-ns-pid'" >> ~/.bashrc
 fi
 
-source ~/.bashrc
-
 
 #############################################
 # Install useful tool
@@ -553,17 +552,20 @@ cd ~
 if [[ "$CHROOT_DEV_TOOL" == "Y" ]]
 then
     LOG "Start to install development tool..."
-    sudo add-apt-repository universe
+    sudo add-apt-repository -y universe
     sudo apt-get install -y git gitk git-gui curl xz-utils
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
     echo "export PATH=$PATH:~/depot_tools" >> ~/.bashrc
 fi
 
-if [[ "$SETUP_GIT_USER_INFO" == "Y" ]]
+if [[ "$SETUP_GIT_GLOBAL_CONFIG" == "Y" ]]
 then
-    LOG "Setup git user name and email"
+    LOG "Setup git global config"
     git config --global user.email $GIT_USER_EMAIL
     git config --global user.name $GIT_USER_NAME
+    git config --global core.autocrlf false
+    git config --global core.filemode false
+    git config --global color.ui true
 fi
 
 #############################################

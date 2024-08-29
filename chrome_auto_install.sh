@@ -2,11 +2,20 @@
 # chrome auto install script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2024/08/28
+# Last modified on 2024/08/29
 # Vertion: 1.0
-
-# How to use: Run this script in Ubuntu 22.04
-
+#
+# How to use:
+#    (1) Run this script in Ubuntu 22.04:
+#
+#        chmod a+x ./chrome_auto_install.sh
+#        ./chrome_auto_install.sh
+#
+#    (2) The script will download defconfig.sh, please edit and save it.
+#        You can also use the default without editing it.
+#
+#    (3) The script will download and execute install_chrome_dev_environment.sh
+#
 
 # ping github.com
 internet_ok=$(ping github.com -c 1 |grep "0% packet loss")
@@ -25,7 +34,11 @@ fi
 
 # allow user to modify defconfig
 echo "please update defconfig.sh if needed..."
-gedit ./defconfig.sh
+
+if command -v gedit &> /dev/null
+then
+    gedit ./defconfig.sh
+fi
 read -p "press any key to continue..." re
 
 # download install_chrome_dev_environment.sh
