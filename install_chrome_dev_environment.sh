@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/08/29
+# Last modified on 2024/08/30
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -26,6 +26,7 @@ UPDATE_UBUNTU="Y"
 # Install useful tool config ("Y" or other):
 INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser
 INSTALL_VSCODE="Y"              # Visual Studio Code
+INSTALL_NOTEPAD="Y"             # Notepad++
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)
 INSTALL_PICOCOM="Y"             # Picocom (serial communication tool)
@@ -246,6 +247,7 @@ Config Git user mail: $GIT_USER_NAME
 Run apt update and upgrade: $UPDATE_UBUNTU
 Install Google Chrome Browser: $INSTALL_CHROME_BROWSER
 Install Visual Studio Code: $INSTALL_VSCODE
+Install Notepad++: $INSTALL_NOTEPAD
 Install Tabby: $INSTALL_TABBY
 Install Minicom: $INSTALL_MINICOM
 Install Picocom: $INSTALL_PICOCOM
@@ -419,6 +421,13 @@ then
 
     echo "$keybindings" > ~/.config/Code/User/keybindings.json
 
+fi
+
+# install Notepad++
+if [[ "$INSTALL_NOTEPAD" == "Y" ]]
+then
+    LOG "Install Notepad++"
+    sudo snap install notepad-plus-plus
 fi
 
 # install Tabby (terminal tool)
