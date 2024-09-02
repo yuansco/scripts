@@ -9,7 +9,7 @@
 # Config                                    #
 #############################################
 
-# Set the git global config, including username and email ("Y" or other):
+# Set the git global config, including username and email ("Y" or "N"):
 # Note: It is necessary for download source code
 SETUP_GIT_GLOBAL_CONFIG="Y"
 
@@ -21,10 +21,10 @@ GIT_USER_NAME="foo"
 # run apt-get update and apt-get upgrade before install
 UPDATE_UBUNTU="Y"
 
-# Install useful tool config ("Y" or other):
-INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser
-INSTALL_VSCODE="Y"              # Visual Studio Code
-INSTALL_NOTEPAD="Y"             # Notepad++
+# Install useful tool config ("Y" or "N"):
+INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser (web browser)
+INSTALL_VSCODE="Y"              # Visual Studio Code (source code editor)
+INSTALL_NOTEPAD="Y"             # Notepad++ (source code editor)
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)
 INSTALL_PICOCOM="Y"             # Picocom (serial communication tool)
