@@ -2,7 +2,7 @@
 # chrome auto install script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2024/08/29
+# Last modified on 2024/10/17
 # Vertion: 1.0
 #
 # How to use:
@@ -26,18 +26,31 @@ then
     read -p "press any key to continue..." re
 fi
 
-# download defconfig.sh
-FILE=./defconfig.sh
-if [ ! -f "$FILE" ]; then
+
+# make sure defconfig is ready before run install_chrome_dev_environment.sh
+defconfig_file_cnt=$(ls | grep def | grep .sh -c)
+
+if [[ "$defconfig_file_cnt" == "1" ]]
+then
+    echo "external config file is ready"
+elif [[ "$defconfig_file_cnt" == "0" ]]
+then
+    # download defconfig.sh
     wget https://raw.githubusercontent.com/yuansco/scripts/main/defconfig.sh
+else
+    echo "Multiple external config files found"
+    exit 0
 fi
 
+defconfig_file=$(ls | grep def | grep .sh)
+
+
 # allow user to modify defconfig
-echo "please update defconfig.sh if needed..."
+echo "please update $defconfig_file if needed..."
 
 if command -v gedit &> /dev/null
 then
-    gedit ./defconfig.sh
+    gedit ./$defconfig_file
 fi
 read -p "press any key to continue..." re
 

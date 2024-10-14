@@ -48,8 +48,13 @@ CHROOT_REPO_FOLDER="chromiumos"               # init folder name, default is ~/c
 # all branch: https://chromium.googlesource.com/chromiumos/manifest.git/+refs
 CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 #CHROOT_REPO_BRANCH="main"                    # main branch
-#CHROOT_REPO_BRANCH="release-R128-15964.B"    # release branch
-#CHROOT_REPO_BRANCH="release-R129-16002.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R130-16033.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R131-16063.B"    # release branch
+
+# sync manifest groups (minilayout+labtools)
+# If you are on a slow network connection or have low disk space, you can use this option.
+# https://chromium.googlesource.com/chromiumos/manifest/
+CHROOT_REPO_MINILAYOUT="N"
 
 CHROOT_REPO_SYNC="Y"                          # sync source code
 CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
@@ -227,11 +232,11 @@ fi
 # load defconfig                            #
 #############################################
 
-FILE=./defconfig.sh
+FILE=$(ls | grep def | grep .sh)
 
 if [ -f "$FILE" ]; then
-    LOG "loading defconfig"
-    source ./defconfig.sh
+    LOG "loading $FILE"
+    source ./$FILE
 fi
 
 
@@ -261,6 +266,7 @@ Install Wine: $INSTALL_WINE
 Chroot dev tools: $CHROOT_DEV_TOOL
 Chroot repo sync: $CHROOT_REPO_SYNC
 Chroot sync jobs: $CHROOT_SYNC_JOBS
+Chroot sync minilayout: $CHROOT_REPO_MINILAYOUT
 Chroot sync tast-tests-private repo: $CHROOT_SYNC_TAST_TESTS_PRIVATE
 Chroot sync strauss repo: $CHROOT_SYNC_STRAUSS
 Chroot run cros_sdk: $CHROOT_CREATE
@@ -283,14 +289,19 @@ fi
 #############################################
 
 alias_note="
+# ========================================================
 # following config is set through the auto install scripts
 # See https://github.com/yuansco/scripts
+"
+
+alias_note_end="# ========================================================
 "
 
 config_github=$(cat ~/.bashrc |grep github)
 
 if [[ "$config_github" == "" ]]
 then
+    add_end="Y"
     echo "$alias_note" >> ~/.bashrc
 fi
 
@@ -325,7 +336,7 @@ fi
 
 # Use gitlog to quickly print oneline git log
 
-config_nano=$(cat ~/.bashrc |grep gitlog)
+config_gitlog=$(cat ~/.bashrc |grep gitlog)
 
 if [[ "$config_gitlog" == "" ]]
 then
@@ -341,6 +352,10 @@ then
     echo "alias ch='cd ~/$CHROOT_REPO_FOLDER;cros_sdk --no-ns-pid'" >> ~/.bashrc
 fi
 
+if [[ "$add_end" == "" ]]
+then
+    echo "$alias_note_end" >> ~/.bashrc
+fi
 
 #############################################
 # Install useful tool
@@ -446,7 +461,7 @@ fi
 if [[ "$INSTALL_TABBY" == "Y" ]]
 then
     LOG "Install Tabby"
-    sudo apt install wget apt-transport-https
+    sudo apt install -y wget apt-transport-https
     sudo snap install curl
     curl -s https://packagecloud.io/install/repositories/eugeny/tabby/script.deb.sh | sudo bash
     sudo apt install -y tabby-terminal
@@ -607,9 +622,15 @@ cd ~/$CHROOT_REPO_FOLDER
 #
 export PATH=$PATH:~/depot_tools
 
+
+if [[ "$CHROOT_REPO_MINILAYOUT" == "Y" ]]
+then
+    REPO_GROUP="-g minilayout,labtools"
+fi
+
 if [[ "$CHROOT_REPO_INIT" == "Y" ]]
 then
-    repo init -u https://chromium.googlesource.com/chromiumos/manifest -b $CHROOT_REPO_BRANCH
+    repo init -u https://chromium.googlesource.com/chromiumos/manifest -b $CHROOT_REPO_BRANCH $REPO_GROUP
 fi
 
 # setup gerrit gerrit key

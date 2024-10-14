@@ -2,7 +2,7 @@
 # defconfig.sh
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2024/08/30
+# Last modified on 2024/10/17
 # Vertion: 1.0
 
 #############################################
@@ -48,6 +48,11 @@ CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 #CHROOT_REPO_BRANCH="main"                    # main branch
 #CHROOT_REPO_BRANCH="release-R128-15964.B"    # release branch
 #CHROOT_REPO_BRANCH="release-R129-16002.B"    # release branch
+
+# sync manifest groups (minilayout+labtools)
+# If you are on a slow network connection or have low disk space, you can use this option.
+# https://chromium.googlesource.com/chromiumos/manifest/
+CHROOT_REPO_MINILAYOUT="N"
 
 CHROOT_REPO_SYNC="Y"                          # sync source code
 CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
