@@ -589,7 +589,7 @@ if [[ "$CHROOT_DEV_TOOL" == "Y" ]]
 then
     LOG "Start to install development tool..."
     sudo add-apt-repository -y universe
-    sudo apt-get install -y git gitk git-gui curl xz-utils
+    sudo apt-get install -y git gitk git-gui curl
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
     echo "export PATH=$PATH:~/depot_tools" >> ~/.bashrc
 fi
