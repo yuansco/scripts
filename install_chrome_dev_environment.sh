@@ -264,6 +264,7 @@ Install Gnome-Screenshot: $INSTALL_SCREENSHOT
 Install Chewing: $INSTALL_CHEWING
 Install Wine: $INSTALL_WINE
 Chroot dev tools: $CHROOT_DEV_TOOL
+Chroot branch: $CHROOT_REPO_BRANCH
 Chroot repo sync: $CHROOT_REPO_SYNC
 Chroot sync jobs: $CHROOT_SYNC_JOBS
 Chroot sync minilayout: $CHROOT_REPO_MINILAYOUT
@@ -292,16 +293,13 @@ alias_note="
 # ========================================================
 # following config is set through the auto install scripts
 # See https://github.com/yuansco/scripts
-"
-
-alias_note_end="# ========================================================
+# ========================================================
 "
 
 config_github=$(cat ~/.bashrc |grep github)
 
 if [[ "$config_github" == "" ]]
 then
-    add_end="Y"
     echo "$alias_note" >> ~/.bashrc
 fi
 
@@ -349,13 +347,11 @@ config_ch=$(cat ~/.bashrc |grep ch=)
 
 if [[ "$config_ch" == "" ]]
 then
-    echo "alias ch='cd ~/$CHROOT_REPO_FOLDER;cros_sdk --no-ns-pid'" >> ~/.bashrc
+    echo "alias ch='cd ~/$CHROOT_REPO_FOLDER;cros_sdk --no-ns-pid --no-update'" >> ~/.bashrc
 fi
 
-if [[ "$add_end" == "" ]]
-then
-    echo "$alias_note_end" >> ~/.bashrc
-fi
+echo >> ~/.bashrc
+echo >> ~/.bashrc
 
 #############################################
 # Install useful tool

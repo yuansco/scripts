@@ -46,8 +46,8 @@ CHROOT_REPO_FOLDER="chromiumos"               # init folder name, default is ~/c
 # all branch: https://chromium.googlesource.com/chromiumos/manifest.git/+refs
 CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 #CHROOT_REPO_BRANCH="main"                    # main branch
-#CHROOT_REPO_BRANCH="release-R128-15964.B"    # release branch
-#CHROOT_REPO_BRANCH="release-R129-16002.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R130-16033.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R131-16063.B"    # release branch
 
 # sync manifest groups (minilayout+labtools)
 # If you are on a slow network connection or have low disk space, you can use this option.
