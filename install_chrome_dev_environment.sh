@@ -626,7 +626,12 @@ fi
 
 if [[ "$CHROOT_REPO_INIT" == "Y" ]]
 then
-    repo init -u https://chromium.googlesource.com/chromiumos/manifest -b $CHROOT_REPO_BRANCH $REPO_GROUP
+    if [[ "$CHROOT_REPO_BRANCH" == "main" || "$CHROOT_REPO_BRANCH" == "stable" ]]
+    then
+        repo init -u https://chromium.googlesource.com/chromiumos/manifest -b $CHROOT_REPO_BRANCH $REPO_GROUP
+    else
+        repo init -u https://chromium.googlesource.com/chromiumos/manifest -b $CHROOT_REPO_BRANCH $REPO_GROUP --repo-url https://chromium.googlesource.com/external/repo.git
+    fi
 fi
 
 # setup gerrit gerrit key
