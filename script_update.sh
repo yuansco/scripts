@@ -36,9 +36,9 @@ fi
 # clean up
 function clean_up(){
 
-    rm -rf ./console_tool.zip
-    rm -rf ./extract.zip
-    rm -rf ./flashdisk.zip
+    rm -rf ./tools/console_tool.zip
+    rm -rf ./tools/extract.zip
+    rm -rf ./tools/flashdisk.zip
 }
 
 # download
@@ -46,9 +46,15 @@ function download(){
 
     clean_up
 
-    wget https://github.com/yuansco/scripts/raw/main/console_tool.zip
-    wget https://github.com/yuansco/scripts/raw/main/extract.zip
-    wget https://github.com/yuansco/scripts/raw/main/flashdisk.zip
+    wget https://github.com/yuansco/scripts/raw/main/tools/console_tool.zip
+    wget https://github.com/yuansco/scripts/raw/main/tools/extract.zip
+    wget https://github.com/yuansco/scripts/raw/main/tools/flashdisk.zip
+
+    mkdir -p tools
+
+    mv ./console_tool.zip  ./tools/console_tool.zip
+    mv ./extract.zip  ./tools/extract.zip
+    mv ./flashdisk.zip  ./tools/flashdisk.zip
 
     echo "script download finish!"
 }
@@ -56,17 +62,19 @@ function download(){
 # pack
 function pack(){
 
-    cp ~/workspace/console_tool.sh ./console_tool.sh
-    cp ~/workspace/cpfe/extract.sh ./extract.sh
-    cp ~/workspace/cpfe/flashdisk.sh ./flashdisk.sh
+    mkdir -p tools
 
-    zip -rP $ZIPKEY ./console_tool.zip ./console_tool.sh
-    zip -rP $ZIPKEY ./extract.zip ./extract.sh
-    zip -rP $ZIPKEY ./flashdisk.zip ./flashdisk.sh
+    cp ~/workspace/console_tool.sh ./tools/console_tool.sh
+    cp ~/workspace/cpfe/extract.sh ./tools/extract.sh
+    cp ~/workspace/cpfe/flashdisk.sh ./tools/flashdisk.sh
 
-    rm -rf ./console_tool.sh
-    rm -rf ./extract.sh
-    rm -rf ./flashdisk.sh
+    zip -rP $ZIPKEY ./tools/console_tool.zip ./tools/console_tool.sh
+    zip -rP $ZIPKEY ./tools/extract.zip ./tools/extract.sh
+    zip -rP $ZIPKEY ./tools/flashdisk.zip ./tools/flashdisk.sh
+
+    rm -rf ./tools/console_tool.sh
+    rm -rf ./tools/extract.sh
+    rm -rf ./tools/flashdisk.sh
 
     echo "script pack finish!"
 }
@@ -76,13 +84,13 @@ function release(){
 
     mkdir -p ~/workspace/cpfe/
 
-    unzip -P $ZIPKEY console_tool.zip
-    unzip -P $ZIPKEY extract.zip
-    unzip -P $ZIPKEY flashdisk.zip
+    unzip -P $ZIPKEY tools/console_tool.zip
+    unzip -P $ZIPKEY tools/extract.zip
+    unzip -P $ZIPKEY tools/flashdisk.zip
 
-    mv ./console_tool.sh ~/workspace/console_tool.sh
-    mv ./extract.sh ~/workspace/cpfe/extract.sh
-    mv ./flashdisk.sh ~/workspace/cpfe/flashdisk.sh
+    mv ./tools/console_tool.sh ~/workspace/console_tool.sh
+    mv ./tools/extract.sh ~/workspace/cpfe/extract.sh
+    mv ./tools/flashdisk.sh ~/workspace/cpfe/flashdisk.sh
 
     chmod a+x ~/workspace/console_tool.sh
     chmod a+x ~/workspace/cpfe/extract.sh

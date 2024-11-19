@@ -2,7 +2,7 @@
 # defconfig.sh
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2024/10/17
+# Last modified on 2024/11/19
 # Vertion: 1.0
 
 #############################################
@@ -48,6 +48,7 @@ CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 #CHROOT_REPO_BRANCH="main"                    # main branch
 #CHROOT_REPO_BRANCH="release-R130-16033.B"    # release branch
 #CHROOT_REPO_BRANCH="release-R131-16063.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R132-16093.B"    # release branch
 
 # sync manifest groups (minilayout+labtools)
 # If you are on a slow network connection or have low disk space, you can use this option.
@@ -59,16 +60,12 @@ CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
 CHROOT_CREATE="Y"                             # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
 
-# TODO: (2) select a baseboard name for setup_board, default is nissa
-CHROOT_TATGET_BOARD="nissa"                   # baseboard for setup_board command
+# TODO: (2) select a baseboard name for setup_board, default is rex
+CHROOT_TATGET_BOARD="rex"                     # baseboard for setup_board command
 
 # sync tast-tests-private repo
 # Note: config gerrit key is necessary for sync private repo
 CHROOT_SYNC_TAST_TESTS_PRIVATE="N"
-
-# sync strauss repo
-# Note: config gerrit key is necessary for sync private repo
-CHROOT_SYNC_STRAUSS="N"
 
 # Setup docker Servod
 # https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/main/docs/servod_outside_chroot.md

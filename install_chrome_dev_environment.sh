@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/08/30
+# Last modified on 2024/11/19
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 22.04
@@ -50,6 +50,7 @@ CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 #CHROOT_REPO_BRANCH="main"                    # main branch
 #CHROOT_REPO_BRANCH="release-R130-16033.B"    # release branch
 #CHROOT_REPO_BRANCH="release-R131-16063.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R132-16093.B"    # release branch
 
 # sync manifest groups (minilayout+labtools)
 # If you are on a slow network connection or have low disk space, you can use this option.
@@ -61,16 +62,12 @@ CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
 CHROOT_CREATE="Y"                             # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
 
-# TODO: (2) select a baseboard name for setup_board, default is nissa
-CHROOT_TATGET_BOARD="nissa"                   # baseboard for setup_board command
+# TODO: (2) select a baseboard name for setup_board, default is rex
+CHROOT_TATGET_BOARD="rex"                     # baseboard for setup_board command
 
 # sync tast-tests-private repo
 # Note: config gerrit key is necessary for sync private repo
 CHROOT_SYNC_TAST_TESTS_PRIVATE="N"
-
-# sync strauss repo
-# Note: config gerrit key is necessary for sync private repo
-CHROOT_SYNC_STRAUSS="N"
 
 # Setup docker Servod
 # https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/main/docs/servod_outside_chroot.md
@@ -397,6 +394,7 @@ then
     code --install-extension ms-vscode.cpptools                       # C/C++
     code --install-extension ms-vscode.cpptools-extension-pack        # C/C++ Extension Pack
     code --install-extension ms-vscode.cpptools-themes                # C/C++ Themes
+    code --install-extension ms-python.python                         # Python
     code --install-extension streetsidesoftware.code-spell-checker    # Code Spell Checker
     code --install-extension plorefice.devicetree                     # DeviceTree
 
@@ -668,28 +666,6 @@ then
     mkdir -p ~/$CHROOT_REPO_FOLDER/.repo/local_manifests
     touch ~/$CHROOT_REPO_FOLDER/.repo/local_manifests/tast-tests-private.xml
     echo "$private_repo_xml" > ~/$CHROOT_REPO_FOLDER/.repo/local_manifests/tast-tests-private.xml
-fi
-
-# Get private repo strauss
-# internal gerrit key is necessary for sync private repo
-
-strauss_xml="<manifest>
-  <project remote=\"cros-internal\"
-           path=\"src/platform/feature-x/strauss/ec\"
-           name=\"chromeos/platform/strauss/ec\"
-           groups=\"firmware\" />
-</manifest>
-"
-
-# sync strauss repo
-if [[ "$CHROOT_SYNC_STRAUSS" == "Y" && "$have_gerrit_key" == "Y" ]]
-then
-
-    # Add strauss in local_manifests
-    LOG "Add strauss repo in local_manifests"
-    mkdir -p ~/$CHROOT_REPO_FOLDER/.repo/local_manifests
-    touch ~/$CHROOT_REPO_FOLDER/.repo/local_manifests/strauss.xml
-    echo "$strauss_xml" > ~/$CHROOT_REPO_FOLDER/.repo/local_manifests/strauss.xml
 fi
 
 # sync source code
