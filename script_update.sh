@@ -88,9 +88,9 @@ function release(){
     unzip -P $ZIPKEY tools/extract.zip
     unzip -P $ZIPKEY tools/flashdisk.zip
 
-    mv ./tools/console_tool.sh ~/workspace/console_tool.sh
-    mv ./tools/extract.sh ~/workspace/cpfe/extract.sh
-    mv ./tools/flashdisk.sh ~/workspace/cpfe/flashdisk.sh
+    mv ./console_tool.sh ~/workspace/console_tool.sh
+    mv ./extract.sh ~/workspace/cpfe/extract.sh
+    mv ./flashdisk.sh ~/workspace/cpfe/flashdisk.sh
 
     chmod a+x ~/workspace/console_tool.sh
     chmod a+x ~/workspace/cpfe/extract.sh
