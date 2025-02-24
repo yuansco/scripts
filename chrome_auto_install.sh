@@ -6,7 +6,7 @@
 # Vertion: 1.0
 #
 # How to use:
-#    (1) Run this script in Ubuntu 22.04:
+#    (1) Run this script in Ubuntu 24.04:
 #
 #        chmod a+x ./chrome_auto_install.sh
 #        ./chrome_auto_install.sh
