@@ -5,7 +5,7 @@
 # Last modified on 2024/11/19
 # Vertion: 1.0
 
-# How to use: Run this script in Ubuntu 22.04
+# How to use: Run this script in Ubuntu 24.04
 
 #############################################
 # Config                                    #
@@ -193,12 +193,12 @@ OS_VERSION=$(cat /etc/lsb-release |grep DISTRIB_RELEASE |cut -d'=' -f 2)
 
 LOG "Detect OS version: $OS_NAME $OS_VERSION"
 
-if [[ "$OS_NAME" != "Ubuntu" || "$OS_VERSION" != "22.04" ]]
+if [[ "$OS_NAME" != "Ubuntu" || "$OS_VERSION" != "24.04" ]]
 then
 
-    # this script only verified on Ubuntu 22.04 LTS, 
+    # this script only verified on Ubuntu 24.04 LTS,
     # show the warning message if run in not verified version.
-    LOG_W "Wronging! This script only verified on Ubuntu 22.04."
+    LOG_W "Wronging! This script only verified on Ubuntu 24.04."
 
     # check user input to continue
     read -p "press y to continue..." re

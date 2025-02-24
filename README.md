@@ -10,4 +10,4 @@ source ~/.bashrc
 ```
 Note 1: This script is not a fully automated installation as some commands may require entering [Y] or user password.
 
-Note 2: Please run the script on Ubuntu 22.04. The newer OS version could potentially work, but it's not guaranteed.
+Note 2: Please run the script on Ubuntu 24.04. The newer OS version could potentially work, but it's not guaranteed.
