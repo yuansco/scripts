@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2024/11/19
+# Last modified on 2025/03/17
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 24.04
@@ -73,6 +73,10 @@ CHROOT_SYNC_TAST_TESTS_PRIVATE="N"
 # https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/main/docs/servod_outside_chroot.md
 SETUP_DOCKER_SERVOD="Y"
 
+# Adding enough swap space during installation can prevent OOM Killer
+# from killing the installation process. If the machine has less
+# than 16G of RAM, it is recommended to enable this setting.
+SETUP_SWAP_DURING_INSTALL="Y"
 
 #############################################
 # Gerrit HTTP Credentials                   #
@@ -210,6 +214,91 @@ then
     fi
 fi
 
+#############################################
+# Resize swap to 16GB if needed             #
+#############################################
+
+# The target memory-to-CPU ratio is 2
+
+function resize_swap_space(){
+
+    LOG "Resize swap to 16GB..."
+
+    # Disable swap
+    sudo swapoff -a
+
+    # Resize swap
+    sudo fallocate -l 16G /tmp/swapfile_temporary
+    sudo chmod 600 /tmp/swapfile_temporary
+    sudo mkswap /tmp/swapfile_temporary
+    sudo swapon /tmp/swapfile_temporary
+
+    LOG "Resize swap done"
+
+    # Function to remove swap file when the script ends
+    cleanup() {
+        sudo swapoff /tmp/swapfile_temporary
+        sudo rm -f /tmp/swapfile_temporary
+        echo "Temporary swap removed."
+    }
+    # Trap exit signals to ensure cleanup
+    trap cleanup EXIT
+}
+
+# Get RAM size in GB
+ram_size_gb=$(free -g | awk 'NR==2{print $2}')
+LOG "Host RAM size is $ram_size_gb GB"
+
+# Get swap space size in GB
+# convert kb to gb
+swap_size_kb=$(swapon -s | awk 'NR==2{print $3}')
+swap_size_gb=$((swap_size_kb / 1024 / 1024))
+LOG "Host swap space size is $swap_size_gb GB"
+
+# Get total memory in GB
+total_memory_gb=$((ram_size_gb + swap_size_gb))
+LOG "Host total memory size is $total_memory_gb GB"
+
+# Get expected total memory size
+cpu_core_count=$(cat /proc/cpuinfo | grep processor | wc -l)
+expected_memory_size_gb=$((cpu_core_count * 2))   # target memory-to-CPU ratio is 2
+LOG "Expected total memory is $expected_memory_size_gb GB"
+
+
+# Two conditions we will try to get more swap size:
+#
+# (1) If the total memory is less than 16GB
+# (2) Memory-to-CPU ratio is less than 2
+#
+
+# (1) If the total memory is less than 16GB
+if [[ "$total_memory_gb" -le 16 ]]
+then
+
+    if [[ "$SETUP_SWAP_DURING_INSTALL" == "Y" ]]
+    then
+        resize_swap_space
+    else
+        LOG_W "Your memory size is not enough to complete install!"
+        LOG_E "Your can enable SETUP_SWAP_DURING_INSTALL=Y to resize swap space automatically"
+    fi
+
+# (2) Memory-to-CPU ratio is less than 2
+elif [[ "$total_memory_gb" -le "$expected_memory_size_gb" ]]
+then
+
+    if [[ "$SETUP_SWAP_DURING_INSTALL" == "Y" ]]
+    then
+        resize_swap_space
+    else
+        LOG_W "Your Memory-to-CPU ratio is less than 2"
+        LOG_W "Your can enable SETUP_SWAP_DURING_INSTALL=Y to resize swap space automatically"
+        # check user input to continue
+        read -p "press y to continue..." re
+    fi
+else
+    LOG "Memory size check done. Swap resize not required."
+fi
 
 #############################################
 # check internet connection                 #
