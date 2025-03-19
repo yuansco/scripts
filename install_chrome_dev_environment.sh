@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2025/03/17
+# Last modified on 2025/03/19
 # Vertion: 1.0
 
 # How to use: Run this script in Ubuntu 24.04
@@ -212,6 +212,23 @@ then
         LOG "Exit script..."
         exit 0
     fi
+fi
+
+#############################################
+# check free space size                     #
+#############################################
+
+# Get free space for the root in GB
+free_space=$(df -h / | awk 'NR==2 {print $4}' | sed 's/G//')
+
+LOG "Host free space is $free_space GB"
+
+# Check if the free_space is greater than 80GB
+if (( $(echo "$free_space > 80" | bc -l) ))
+then
+    LOG "Host free space is enough."
+else
+    LOG_E "The free space is NOT enough to complete install!"
 fi
 
 #############################################
