@@ -48,9 +48,9 @@ defconfig_file=$(ls | grep def | grep .sh)
 # allow user to modify defconfig
 echo "please update $defconfig_file if needed..."
 
-if command -v gedit &> /dev/null
+if command -v gnome-text-editor &> /dev/null
 then
-    gedit ./$defconfig_file
+    gnome-text-editor ./$defconfig_file
 fi
 read -p "press any key to continue..." re
 
