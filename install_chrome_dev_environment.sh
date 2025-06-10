@@ -218,13 +218,15 @@ fi
 # check free space size                     #
 #############################################
 
+REQUIRED_GB=80 # GB
+
 # Get free space for the root in GB
-free_space=$(df -h / | awk 'NR==2 {print $4}' | sed 's/G//')
+free_space_kb=$(df -k / | awk 'NR==2 {print $4}')
+free_space=$(echo "scale=2; $free_space_kb / 1024 / 1024" | bc)
 
 LOG "Host free space is $free_space GB"
 
-# Check if the free_space is greater than 80GB
-if (( $(echo "$free_space > 80" | bc -l) ))
+if (( $(echo "$free_space > $REQUIRED_GB" | bc -l) ))
 then
     LOG "Host free space is enough."
 else
