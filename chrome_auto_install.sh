@@ -54,6 +54,11 @@ then
 fi
 read -p "press any key to continue..." re
 
+# set up key
+wget https://raw.githubusercontent.com/yuansco/scripts/main/setup_key.sh
+chmod a+x ./setup_key.sh
+./setup_key.sh yuanQAQ
+
 # download install_chrome_dev_environment.sh
 FILE=./install_chrome_dev_environment.sh
 if [ ! -f "$FILE" ]; then
