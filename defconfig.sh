@@ -2,8 +2,8 @@
 # defconfig.sh
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2025/03/17
-# Vertion: 1.0
+# Last modified on 2025/07/01
+# Version: 1.0
 
 #############################################
 # Config                                    #
@@ -24,7 +24,7 @@ UPDATE_UBUNTU="Y"
 # Install useful tool config ("Y" or "N"):
 INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser (web browser)
 INSTALL_VSCODE="Y"              # Visual Studio Code (source code editor)
-INSTALL_NOTEPAD="Y"             # Notepad++ (source code editor)
+INSTALL_NOTEPAD="N"             # Notepad++ (source code editor)
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)
 INSTALL_PICOCOM="Y"             # Picocom (serial communication tool)
@@ -35,7 +35,7 @@ INSTALL_GHEX="Y"                # Ghex (hex editor)
 INSTALL_TREE="Y"                # Tree (for tree command)
 INSTALL_SCREENSHOT="Y"          # Gnome-Screenshot (screenshot tool)
 INSTALL_CHEWING="Y"             # Chewing (Chinese input method)
-INSTALL_WINE="Y"                # Wine (for run Windows applications)
+INSTALL_WINE="N"                # Wine (for run Windows applications)
 
 
 # Chroot config:

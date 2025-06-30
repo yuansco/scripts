@@ -2,8 +2,8 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2025/03/19
-# Vertion: 1.0
+# Last modified on 2025/07/01
+# Version: 1.0
 
 # How to use: Run this script in Ubuntu 24.04
 
@@ -26,7 +26,7 @@ UPDATE_UBUNTU="Y"
 # Install useful tool config ("Y" or "N"):
 INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser (web browser)
 INSTALL_VSCODE="Y"              # Visual Studio Code (source code editor)
-INSTALL_NOTEPAD="Y"             # Notepad++ (source code editor)
+INSTALL_NOTEPAD="N"             # Notepad++ (source code editor)
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)
 INSTALL_PICOCOM="Y"             # Picocom (serial communication tool)
@@ -37,7 +37,7 @@ INSTALL_GHEX="Y"                # Ghex (hex editor)
 INSTALL_TREE="Y"                # Tree (for tree command)
 INSTALL_SCREENSHOT="Y"          # Gnome-Screenshot (screenshot tool)
 INSTALL_CHEWING="Y"             # Chewing (Chinese input method)
-INSTALL_WINE="Y"                # Wine (for run Windows applications)
+INSTALL_WINE="N"                # Wine (for run Windows applications)
 
 
 # Chroot config:
@@ -189,16 +189,17 @@ function LOG_C(){
 # check os version                          #
 #############################################
 
-# get os name
-OS_NAME=$(cat /etc/lsb-release |grep DISTRIB_ID |cut -d'=' -f 2)
 
-# get os version
-OS_VERSION=$(cat /etc/lsb-release |grep DISTRIB_RELEASE |cut -d'=' -f 2)
+# get os name and version
+if [ -f /etc/lsb-release ]; then
+    source /etc/lsb-release
+else
+    LOG_E "Cannot find /etc/lsb-release. Is this a Debian-based system?"
+fi
 
-LOG "Detect OS version: $OS_NAME $OS_VERSION"
+LOG "Detect OS version: $DISTRIB_ID $DISTRIB_RELEASE"
 
-if [[ "$OS_NAME" != "Ubuntu" || "$OS_VERSION" != "24.04" ]]
-then
+if [[ "$DISTRIB_ID" != "Ubuntu" || "$DISTRIB_RELEASE" != "24.04" ]]; then
 
     # this script only verified on Ubuntu 24.04 LTS,
     # show the warning message if run in not verified version.
@@ -401,57 +402,33 @@ alias_note="
 # ========================================================
 "
 
-config_github=$(cat ~/.bashrc |grep github)
-
-if [[ "$config_github" == "" ]]
-then
+if ! grep -q "github" ~/.bashrc; then
     echo "$alias_note" >> ~/.bashrc
 fi
 
 # defend themselves against accidentally deleting files by creating an alias
-
-config_rm=$(cat ~/.bashrc |grep rm)
-
-if [[ "$config_rm" == "" ]]
-then
+if ! grep -q "rm -i" ~/.bashrc; then
     echo "alias rm='rm -i'" >> ~/.bashrc
 fi
 
-
 # always clear known_hosts to prevent issue "WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!"
-
-config_scp=$(cat ~/.bashrc |grep scp)
-
-if [[ "$config_scp" == "" ]]
-then
+if ! grep -q "scp" ~/.bashrc; then
     echo "alias scp='rm -f /home/$USER/.ssh/known_hosts;scp'" >> ~/.bashrc
     echo "alias ssh='rm -f /home/$USER/.ssh/known_hosts;ssh'" >> ~/.bashrc
 fi
 
 # Use nano when edit commit message
-
-config_nano=$(cat ~/.bashrc |grep nano)
-
-if [[ "$config_nano" == "" ]]
-then
+if ! grep -q "nano" ~/.bashrc; then
     echo "alias EDITOR='nano'" >> ~/.bashrc
 fi
 
 # Use gitlog to quickly print oneline git log
-
-config_gitlog=$(cat ~/.bashrc |grep gitlog)
-
-if [[ "$config_gitlog" == "" ]]
-then
+if ! grep -q "gitlog" ~/.bashrc; then
     echo "alias gitlog='git log --pretty=oneline'" >> ~/.bashrc
 fi
 
 # Use ch to quickly enter cros_sdk
-
-config_ch=$(cat ~/.bashrc |grep ch=)
-
-if [[ "$config_ch" == "" ]]
-then
+if ! grep -q "ch=" ~/.bashrc; then
     echo "alias ch='cd ~/$CHROOT_REPO_FOLDER;cros_sdk --no-ns-pid --no-update'" >> ~/.bashrc
 fi
 
@@ -479,22 +456,36 @@ fi
 if [[ "$INSTALL_CHROME_BROWSER" == "Y" ]]
 then
     LOG "Install Google Chrome Browser"
-    wget -c https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    sudo dpkg -i google-chrome-stable_current_amd64.deb
-    rm ./google-chrome-stable_current_amd64.deb
+
+    if command -v google-chrome &> /dev/null
+    then
+        LOG "Google Chrome is ready"
+    else
+        # download deb file
+        wget -c https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        # install deb file via dpkg
+        sudo dpkg -i google-chrome-stable_current_amd64.deb
+        # remove deb file
+        rm ./google-chrome-stable_current_amd64.deb
+    fi
 fi
 
 # install Visual Studio Code
 if [[ "$INSTALL_VSCODE" == "Y" ]]
 then
     LOG "Install Visual Studio Code"
-    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-    sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-    sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-    rm -f packages.microsoft.gpg
-    sudo apt install apt-transport-https
-    sudo apt update
-    sudo apt install code
+
+    if command -v code &> /dev/null
+    then
+        LOG "Visual Studio Code is ready"
+    else
+        sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
+        sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+        rm -f packages.microsoft.gpg
+        sudo apt install apt-transport-https
+        sudo apt update
+        sudo apt install code
+    fi
 
     # install vscode extensions
     LOG "Install Visual Studio Code extensions"
@@ -693,7 +684,10 @@ then
     sudo add-apt-repository -y universe
     sudo apt-get install -y git gitk git-gui curl
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-    echo "export PATH=$PATH:~/depot_tools" >> ~/.bashrc
+
+    if ! grep -q 'depot_tools' ~/.bashrc; then
+        echo "export PATH=$PATH:~/depot_tools" >> ~/.bashrc
+    fi
 fi
 
 if [[ "$SETUP_GIT_GLOBAL_CONFIG" == "Y" ]]

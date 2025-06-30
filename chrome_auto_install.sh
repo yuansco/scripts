@@ -2,8 +2,8 @@
 # chrome auto install script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2024/10/17
-# Vertion: 1.0
+# Last modified on 2025/07/01
+# Version: 1.0
 #
 # How to use:
 #    (1) Run this script in Ubuntu 24.04:
@@ -18,10 +18,9 @@
 #
 
 # ping github.com
-internet_ok=$(ping github.com -c 1 |grep "0% packet loss")
-
-if [[ "$internet_ok" == "" ]]
-then
+if ping -c 1 github.com &>/dev/null; then
+    echo "Internet connection appears to be working."
+else
     echo "internet check fail!"
     read -p "press any key to continue..." re
 fi

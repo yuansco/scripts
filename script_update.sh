@@ -1,7 +1,7 @@
 #!/bin/bash
 # Download, Update and Backup scripts
 # https://github.com/yuansco/scripts
-# Vertion: 1.0
+# Version: 1.0
 #
 # How to use:
 #
