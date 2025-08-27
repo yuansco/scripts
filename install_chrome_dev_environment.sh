@@ -798,10 +798,35 @@ mkdir -p ~/$CHROOT_REPO_FOLDER/src/myfile/cbi
 mkdir -p ~/$CHROOT_REPO_FOLDER/src/myfile/scripts
 
 
-# Always show debug logs when building ec firmware through zmake
-# Add environment variables in cros_sdk's bashrc
+# Creates a zmake wrapper function that enhances build commands
+# with debug logging and forced rebuild.
+#
+# When 'zmake build <board>' is called, it automatically becomes
+# 'zmake -l DEBUG build --clobber <board>'
+#
+# https://chromium.googlesource.com/chromiumos/platform/ec/+/HEAD/zephyr/zmake/
+# --clobber :
+# Delete existing build directories, even if configuration is unchanged
+# -l or --log-level :
+# Set the logging level {DEBUG,INFO,WARNING,ERROR,CRITICAL}  (default=INFO)
+
 
 FILE="$HOME/$CHROOT_REPO_FOLDER/out/home/$USER/.bashrc"
+
+zmake_func='
+# When zmake build <board> is called, it automatically becomes
+# zmake -l DEBUG build --clobber <board>
+zmake() {
+    if [[ "$1" == "build" && $# -gt 1 ]]; then
+        # Extract all arguments after "build"
+        shift  # Remove "build" from arguments
+        echo "RUN: zmake -l DEBUG build --clobber "$@""
+        command zmake -l DEBUG build --clobber "$@"
+    else
+        command zmake "$@"
+    fi
+}
+'
 
 zmake_alias=$(cat $FILE |grep zmake)
 
@@ -810,7 +835,8 @@ then
     if [ -z "$zmake_alias" ]
     then
         LOG "Setup zmake alias"
-        echo "alias zmake='zmake -l DEBUG'" >> $FILE
+        #echo "alias zmake='zmake -l DEBUG'" >> $FILE
+        echo "$zmake_func" >> $FILE
     else
         LOG "zmake alias is ready"
     fi
