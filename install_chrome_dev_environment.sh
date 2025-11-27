@@ -479,12 +479,7 @@ then
     then
         LOG "Visual Studio Code is ready"
     else
-        sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
-        sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-        rm -f packages.microsoft.gpg
-        sudo apt install apt-transport-https
-        sudo apt update
-        sudo apt install code
+        sudo snap install --classic code
     fi
 
     # install vscode extensions
@@ -681,6 +676,7 @@ cd ~
 if [[ "$CHROOT_DEV_TOOL" == "Y" ]]
 then
     LOG "Start to install development tool..."
+    sudo apt install adb
     sudo add-apt-repository -y universe
     sudo apt-get install -y git gitk git-gui curl
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
