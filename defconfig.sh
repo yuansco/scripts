@@ -2,7 +2,7 @@
 # defconfig.sh
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2025/07/01
+# Last modified on 2026/01/29
 # Version: 1.0
 
 #############################################
@@ -46,9 +46,9 @@ CHROOT_REPO_FOLDER="chromiumos"               # init folder name, default is ~/c
 # all branch: https://chromium.googlesource.com/chromiumos/manifest.git/+refs
 CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 #CHROOT_REPO_BRANCH="main"                    # main branch
-#CHROOT_REPO_BRANCH="release-R133-16151.B"    # release branch
-#CHROOT_REPO_BRANCH="release-R134-16181.B"    # release branch
-#CHROOT_REPO_BRANCH="release-R135-16209.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R143-16463.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R144-16503.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R145-16552.B"    # release branch
 
 # sync manifest groups (minilayout+labtools)
 # If you are on a slow network connection or have low disk space, you can use this option.
@@ -56,7 +56,7 @@ CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 CHROOT_REPO_MINILAYOUT="N"
 
 CHROOT_REPO_SYNC="Y"                          # sync source code
-CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
+CHROOT_SYNC_JOBS=12                           # allow N jobs at repo sync
 CHROOT_CREATE="Y"                             # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
 

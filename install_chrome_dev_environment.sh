@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2025/07/01
+# Last modified on 2026/01/29
 # Version: 1.0
 
 # How to use: Run this script in Ubuntu 24.04
@@ -48,9 +48,9 @@ CHROOT_REPO_FOLDER="chromiumos"               # init folder name, default is ~/c
 # all branch: https://chromium.googlesource.com/chromiumos/manifest.git/+refs
 CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 #CHROOT_REPO_BRANCH="main"                    # main branch
-#CHROOT_REPO_BRANCH="release-R130-16033.B"    # release branch
-#CHROOT_REPO_BRANCH="release-R131-16063.B"    # release branch
-#CHROOT_REPO_BRANCH="release-R132-16093.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R143-16463.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R144-16503.B"    # release branch
+#CHROOT_REPO_BRANCH="release-R145-16552.B"    # release branch
 
 # sync manifest groups (minilayout+labtools)
 # If you are on a slow network connection or have low disk space, you can use this option.
@@ -58,7 +58,7 @@ CHROOT_REPO_BRANCH="stable"                   # stable branch (default)
 CHROOT_REPO_MINILAYOUT="N"
 
 CHROOT_REPO_SYNC="Y"                          # sync source code
-CHROOT_SYNC_JOBS=8                            # allow N jobs at repo sync
+CHROOT_SYNC_JOBS=12                           # allow N jobs at repo sync
 CHROOT_CREATE="Y"                             # create chroot after repo sync
 CHROOT_SETUP_BOARD="Y"                        # run setup board after create chroot
 
@@ -846,6 +846,13 @@ fi
 # https://chromium.googlesource.com/chromiumos/third_party/hdctools/+/main/docs/servod_outside_chroot.md
 #############################################
 
+
+docker_apt_sources="Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc"
+
 if [[ "$SETUP_DOCKER_SERVOD" == "Y" ]]
 then
 
@@ -856,7 +863,7 @@ then
     source ~/.bashrc
 
     #  Install Docker Engine on Ubuntu
-    for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do sudo apt-get remove $pkg; done
+    sudo apt remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1)
 
     # get os name and version
     if [[ "$DISTRIB_ID" == "" ]]; then
@@ -877,25 +884,30 @@ then
         echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
         $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     else
         # For default Ubuntu 24.04
         # Add Docker's official GPG key:
-        sudo apt-get update
-        sudo apt-get install -y ca-certificates curl
+        sudo apt update
+        sudo apt install -y ca-certificates curl
         sudo install -m 0755 -d /etc/apt/keyrings
         sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
         sudo chmod a+r /etc/apt/keyrings/docker.asc
 
         # Add the repository to Apt sources:
-        echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-    fi
 
-    # Add the repository to Apt sources(continue):
-    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        echo "$docker_apt_sources" > docker.sources
+        sudo mv docker.sources /etc/apt/sources.list.d/
+
+        sudo chown root:root /etc/apt/sources.list.d/docker.sources
+        sudo chmod 644 /etc/apt/sources.list.d/docker.sources
+
+        # start install docker
+        sudo apt update
+        sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    fi
 
     # Test Docker Engine
     LOG "Test Docker Engine..."
