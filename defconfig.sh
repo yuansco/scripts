@@ -2,7 +2,7 @@
 # defconfig.sh
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/08/23
-# Last modified on 2026/01/29
+# Last modified on 2026/04/22
 # Version: 1.0
 
 #############################################
@@ -24,6 +24,7 @@ UPDATE_UBUNTU="Y"
 # Install useful tool config ("Y" or "N"):
 INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser (web browser)
 INSTALL_VSCODE="Y"              # Visual Studio Code (source code editor)
+INSTALL_ANTIGRAVITY="N"         # Google Antigravity (AI code assistant)
 INSTALL_NOTEPAD="N"             # Notepad++ (source code editor)
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)

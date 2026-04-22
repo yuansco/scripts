@@ -2,7 +2,7 @@
 # Install Chromebook develop environment script
 # https://github.com/yuansco/scripts
 # Created by Yu-An Chen on 2024/03/26
-# Last modified on 2026/01/29
+# Last modified on 2026/04/22
 # Version: 1.0
 
 # How to use: Run this script in Ubuntu 24.04
@@ -26,6 +26,7 @@ UPDATE_UBUNTU="Y"
 # Install useful tool config ("Y" or "N"):
 INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser (web browser)
 INSTALL_VSCODE="Y"              # Visual Studio Code (source code editor)
+INSTALL_ANTIGRAVITY="N"         # Google Antigravity (AI code assistant)
 INSTALL_NOTEPAD="N"             # Notepad++ (source code editor)
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)
@@ -358,6 +359,7 @@ Config Git user mail: $GIT_USER_NAME
 Run apt update and upgrade: $UPDATE_UBUNTU
 Install Google Chrome Browser: $INSTALL_CHROME_BROWSER
 Install Visual Studio Code: $INSTALL_VSCODE
+Install Antigravity: $INSTALL_ANTIGRAVITY
 Install Notepad++: $INSTALL_NOTEPAD
 Install Tabby: $INSTALL_TABBY
 Install Minicom: $INSTALL_MINICOM
@@ -536,6 +538,26 @@ then
 
     echo "$keybindings" > ~/.config/Code/User/keybindings.json
 
+fi
+
+# install Google Antigravity
+# https://antigravity.google/download/linux
+if [[ "$INSTALL_ANTIGRAVITY" == "Y" ]]
+then
+    LOG "installing Antigravity"
+
+    # 1. Add repository to sources.list.d
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://us-central1-apt.pkg.dev/doc/repo-signing-key.gpg | \
+    sudo gpg --dearmor --yes -o /etc/apt/keyrings/antigravity-repo-key.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/antigravity-repo-key.gpg] https://us-central1-apt.pkg.dev/projects/antigravity-auto-updater-dev/ antigravity-debian main" | \
+    sudo tee /etc/apt/sources.list.d/antigravity.list > /dev/null
+
+    # 2. Update package cache
+    sudo apt update
+
+    # 3. Install the package
+    sudo apt install antigravity
 fi
 
 # install Notepad++
