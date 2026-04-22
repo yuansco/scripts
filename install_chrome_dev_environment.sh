@@ -509,7 +509,7 @@ then
     # setup keybindings.json
     keybindings="[
         {
-                \"key\": \"ctrl+left\",
+                \"key\": \"ctrl+right\",
                 \"command\": \"workbench.action.nextEditorInGroup\"
         },
         {
@@ -517,7 +517,7 @@ then
                 \"command\": \"-workbench.action.nextEditorInGroup\"
         },
         {
-                \"key\": \"ctrl+right\",
+                \"key\": \"ctrl+left\",
                 \"command\": \"workbench.action.previousEditorInGroup\"
         },
         {
