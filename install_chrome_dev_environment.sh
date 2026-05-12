@@ -499,6 +499,7 @@ then
     \"editor.fontFamily\": \"Consolas, 'Courier New', monospace\",
     \"editor.mouseWheelZoom\": true,
     \"editor.tabSize\": 8,
+    \"editor.formatOnSave\": false
     \"window.zoomLevel\": 1.2,
     \"github.gitAuthentication\": false,
     \"git.terminalAuthentication\": false,
