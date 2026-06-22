@@ -699,7 +699,7 @@ cd ~
 if [[ "$CHROOT_DEV_TOOL" == "Y" ]]
 then
     LOG "Start to install development tool..."
-    sudo apt install adb
+    sudo apt install -y adb
     sudo add-apt-repository -y universe
     sudo apt-get install -y git gitk git-gui curl
     git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
@@ -707,6 +707,16 @@ then
     if ! grep -q 'depot_tools' ~/.bashrc; then
         echo "export PATH=$PATH:~/depot_tools" >> ~/.bashrc
     fi
+
+    # Add udev rules to allow non-root access to specific adb cable
+    sudo tee -a /etc/udev/rules.d/51-android.rules > /dev/null << 'EOF'
+SUBSYSTEM=="usb", ATTRS{idVendor}=="18d1", ATTRS{idProduct}=="506d", MODE="0666", GROUP="plugdev", SYMLINK+="android%n"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="18d1", ATTRS{idProduct}=="0010", MODE="0666", GROUP="plugdev", SYMLINK+="android%n"
+EOF
+    # Reload udev rules to apply changes immediately
+    sudo udevadm control --reload-rules
+    sudo udevadm trigger
+
 fi
 
 if [[ "$SETUP_GIT_GLOBAL_CONFIG" == "Y" ]]
