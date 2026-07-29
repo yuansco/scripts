@@ -493,6 +493,8 @@ then
     code --install-extension ms-python.python                         # Python
     code --install-extension streetsidesoftware.code-spell-checker    # Code Spell Checker
     code --install-extension plorefice.devicetree                     # DeviceTree
+    code --install-extension saoudrizwan.claude-dev                   # Cline
+
 
     # setup settings.json
     settings="{
