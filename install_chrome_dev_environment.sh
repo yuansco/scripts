@@ -26,7 +26,8 @@ UPDATE_UBUNTU="Y"
 # Install useful tool config ("Y" or "N"):
 INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser (web browser)
 INSTALL_VSCODE="Y"              # Visual Studio Code (source code editor)
-INSTALL_ANTIGRAVITY="N"         # Google Antigravity (AI code assistant)
+INSTALL_ANTIGRAVITY_IDE="N"     # Google Antigravity IDE (AI code editor)
+INSTALL_ANTIGRAVITY_CLI="N"     # Google Antigravity cli (AI code cli)
 INSTALL_NOTEPAD="N"             # Notepad++ (source code editor)
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)
@@ -359,7 +360,8 @@ Config Git user mail: $GIT_USER_NAME
 Run apt update and upgrade: $UPDATE_UBUNTU
 Install Google Chrome Browser: $INSTALL_CHROME_BROWSER
 Install Visual Studio Code: $INSTALL_VSCODE
-Install Antigravity: $INSTALL_ANTIGRAVITY
+Install Antigravity IDE: $INSTALL_ANTIGRAVITY_IDE
+Install Antigravity CLI: $INSTALL_ANTIGRAVITY_CLI
 Install Notepad++: $INSTALL_NOTEPAD
 Install Tabby: $INSTALL_TABBY
 Install Minicom: $INSTALL_MINICOM
@@ -543,11 +545,11 @@ then
 
 fi
 
-# install Google Antigravity
+# install Google Antigravity IDE
 # https://antigravity.google/download/linux
-if [[ "$INSTALL_ANTIGRAVITY" == "Y" ]]
+if [[ "$INSTALL_ANTIGRAVITY_IDE" == "Y" ]]
 then
-    LOG "installing Antigravity"
+    LOG "installing Antigravity IDE"
 
     # 1. Add repository to sources.list.d
     sudo mkdir -p /etc/apt/keyrings
@@ -561,6 +563,14 @@ then
 
     # 3. Install the package
     sudo apt install antigravity
+fi
+
+# install Google Antigravity CLI
+# https://antigravity.google/download#antigravity-2
+if [[ "$INSTALL_ANTIGRAVITY_CLI" == "Y" ]]
+then
+    LOG "installing Antigravity CLI"
+    curl -fsSL https://antigravity.google/cli/install.sh | bash
 fi
 
 # install Notepad++

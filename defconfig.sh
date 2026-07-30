@@ -24,7 +24,8 @@ UPDATE_UBUNTU="Y"
 # Install useful tool config ("Y" or "N"):
 INSTALL_CHROME_BROWSER="Y"      # Google Chrome Browser (web browser)
 INSTALL_VSCODE="Y"              # Visual Studio Code (source code editor)
-INSTALL_ANTIGRAVITY="N"         # Google Antigravity (AI code assistant)
+INSTALL_ANTIGRAVITY_IDE="N"     # Google Antigravity IDE (AI code editor)
+INSTALL_ANTIGRAVITY_CLI="N"     # Google Antigravity cli (AI code cli)
 INSTALL_NOTEPAD="N"             # Notepad++ (source code editor)
 INSTALL_TABBY="Y"               # Tabby (terminal tool)
 INSTALL_MINICOM="Y"             # Minicom (serial communication tool)
