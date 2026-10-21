@@ -651,55 +651,32 @@ then
 fi
 
 #############################################
-# Install private tool
-# e.g. console tool, extract and flashdisk
+# Install console tool (console_tool_v2.sh)
 #############################################
 
+LOG "Start to install console tool..."
 
-install_tool="Y"
+mkdir -p ~/workspace
 
-# get zip key from $ZIPKEY or ~/.key.txt
-if [[ "$ZIPKEY" == "" ]]
-then
-
-    if [ ! -f ~/.key.txt ]
-    then
-        install_tool="N"
-    else
-        ZIPKEY=$(cat ~/.key.txt)
-    fi
+if [ -f ./tools/console_tool_v2.sh ]; then
+    cp ./tools/console_tool_v2.sh ~/workspace/console_tool_v2.sh
+else
+    # if we don't have whole repo, download script from github
+    # this allows the script can run individually
+    wget https://raw.githubusercontent.com/yuansco/scripts/main/tools/console_tool_v2.sh -O ~/workspace/console_tool_v2.sh
 fi
 
+if [ -f ~/workspace/console_tool_v2.sh ]; then
+    chmod a+x ~/workspace/console_tool_v2.sh
 
-if [[ "$install_tool" == "Y" ]]
-then
-
-    LOG "Start to install private tool..."
-
-    LOG "zip key: $ZIPKEY"
-
-    # if we don't have whole repo, download expand script from github
-    # this allows the script can running individually
-    if [ ! -f ./script_update.sh ]
-    then
-        wget https://raw.githubusercontent.com/yuansco/scripts/main/script_update.sh
+    if grep -q "console_tool.sh" ~/.bashrc 2>/dev/null; then
+        sed -i 's|~/workspace/console_tool.sh|~/workspace/console_tool_v2.sh|g' ~/.bashrc
+    elif ! grep -q "console_tool_v2.sh" ~/.bashrc 2>/dev/null; then
+        echo "alias console='~/workspace/console_tool_v2.sh'" >> ~/.bashrc
     fi
-
-    if [ -f ./script_update.sh ]
-    then
-        chmod a+x ./script_update.sh
-
-        # download and release scripts
-        ./script_update.sh -d -r
-
-        # clean up zip file
-        ./script_update.sh -c
-
-        # remove expand script
-        rm -f ./script_update.sh
-    else
-        LOG_W "download expand script fail!"
-    fi
+    LOG "Console tool installed successfully."
+else
+    LOG_W "Install console tool failed!"
 fi
 
 #############################################
