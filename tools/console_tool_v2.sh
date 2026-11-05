@@ -1,22 +1,24 @@
 #!/bin/bash
 # ==============================================================================
-# Console Tool v2
+# Console Tool v2.1
 # This script is used to connect console ports of Chromebooks via servo boards
 # and hdctools (servod / dut-control), as well as provide ADB shell connection.
 #
 # Original Author: Yu-An Chen
-# Refactored Version: 2.0 (based on v5.8)
-# Last Modified: 2026/10/21
+# Refactored Version: 2.1 (based on v2.0)
+# Last Modified: 2026/11/05
 # ==============================================================================
 
 # Script metadata
-readonly SCRIPT_VERSION="2.0"
-readonly LAST_MODIFIED="2026/10/21"
+readonly SCRIPT_VERSION="2.1"
+readonly LAST_MODIFIED="2026/11/05"
 readonly DOWNLOAD_URL="https://raw.githubusercontent.com/yuansco/scripts/main/tools/console_tool_v2.sh"
 
+# Script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+
 # Default configuration paths
-BOARD_LIST="${BOARD_LIST:-$HOME/workspace/board_list.sh}"
-[[ -f "$BOARD_LIST" ]] || BOARD_LIST="$HOME/board_list.sh"
+BOARD_LIST="${BOARD_LIST:-$SCRIPT_DIR/board_list.sh}"
 
 # Default board list template if file does not exist
 DEFAULT_BOARD_LIST='#!/bin/bash
@@ -33,7 +35,7 @@ support_board+=("ocelot,ocelot_ite,Y,N,Y,Y")             #  7. ocelot (baseboard
 support_board+=("matsu,ocelot_matsu,Y,N,Y,Y")            #  8. ocelot/matsu
 support_board+=("moonstone,fatcat_kinmen,Y,N,Y,Y")       #  9. fatcat/moonstone
 support_board+=("caboc,brox_caboc,Y,N,Y,Y")              # 10. brox/caboc
-support_board+=("aneto,bluey -m pic,Y,N,Y,Y")            # 11. bluey/aneto
+support_board+=("aneto,bluey_aneto,Y,N,Y,Y")             # 11. bluey/aneto
 
 ADB_IP="192.168.1.101"
 '
@@ -111,6 +113,7 @@ show_help() {
  Options:
    -c, --channel [CHAN]  Channel selection (release, local, latest, beta). Default: release
    -h, --help            Show this help message
+   --init, init          Add 'console' alias to ~/.bashrc using current script path
    -l, --list            Print support board list
    -m, --minicom         Use minicom to open console port (default: picocom)
    -r, --record, --log   Record console session to log file
@@ -225,6 +228,20 @@ update_script() {
 
     LOG "Script updated successfully to $target_script"
     exit 0
+}
+
+# ------------------------------------------------------------------------------
+# Initialize Alias in ~/.bashrc
+# ------------------------------------------------------------------------------
+init_alias() {
+    local script_path
+    script_path="$(realpath "${BASH_SOURCE[0]}" 2>/dev/null || echo "$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")")"
+    local bashrc="$HOME/.bashrc"
+    local alias_cmd="alias console='$script_path'"
+
+    LOG "Adding alias to $bashrc: $alias_cmd"
+    echo "$alias_cmd" >> "$bashrc"
+    LOG "Alias added successfully. Run 'source ~/.bashrc' or restart your terminal to apply."
 }
 
 # ------------------------------------------------------------------------------
@@ -642,6 +659,10 @@ main() {
                 ;;
             -v|-V|--version)
                 echo "Console Tool v$SCRIPT_VERSION ($LAST_MODIFIED)"
+                exit 0
+                ;;
+            init|--init)
+                init_alias
                 exit 0
                 ;;
             -l|--list|--list_board)
